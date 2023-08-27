@@ -1,0 +1,24 @@
+/*[Bb]uild*/
+
+# 不上传某些测试节点
+/plugins/test_*/
+
+# clangd
+.cache
+
+# JetBrains
+.idea/
+
+# Visual Studio
+.vs/
+
+# Visual Studio Code
+.vscode/*
+!.vscode/launch.json
+
+# QtCreator
+*.user
+*.user.*
+
+# MacOS
+.DS_Store

@@ -1,0 +1,23 @@
+---
+BasedOnStyle: Google
+IndentWidth: 4
+Language: Cpp
+AccessModifierOffset: -2
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+BinPackParameters: false
+BreakBeforeBraces: Mozilla
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+ColumnLimit: 120
+DerivePointerAlignment: false
+DisableFormat: false
+PackConstructorInitializers: NextLine
+PointerAlignment: Right
+ReflowComments: true # 重排注释
+SortIncludes: CaseInsensitive
+UseTab: Never
