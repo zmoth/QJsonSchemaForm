@@ -32,15 +32,16 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(par
     }
     _schema = jsonDocument.object();
 
+    // 为主窗口添加一个布局，以容纳json编辑器和Form窗口
     auto *w = new QWidget(this);
     auto *layout = new QHBoxLayout(w);
     setCentralWidget(w);
 
-    // 数据区域
+    // json 数据区域
     auto *jsonDataEditor = new QTextEdit(this);
     layout->addWidget(jsonDataEditor);
 
-    // schema 区域
+    // json schema 区域
     auto *jsonSchemaEditor = new QTextEdit(this);
     jsonSchemaEditor->setText(QJsonDocument(_schema).toJson(QJsonDocument::Indented));
     auto *highlighter = new JsonHighlighter(jsonSchemaEditor->document());
@@ -48,7 +49,6 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(par
 
     // 表单绘制区域
     auto *form = new QJsonSchemaForm(_schema, w);
-    form->setObjectName("form");
     layout->addWidget(form);
 
     // // 数据更新会刷新表单

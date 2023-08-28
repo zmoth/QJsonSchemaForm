@@ -13,6 +13,8 @@
 
 QT_BEGIN_NAMESPACE
 
+class QFormLayout;
+
 /// @brief (vue-json-schema-form)[https://form.lljj.me/]
 class QJsonSchemaForm : public QWidget
 {
@@ -23,13 +25,16 @@ class QJsonSchemaForm : public QWidget
 
     // static QJsonSchemaForm::CreatorMap cmap();
 
+    explicit QJsonSchemaForm(QWidget *parent = nullptr);
     explicit QJsonSchemaForm(const QJsonObject &schema, QWidget *parent = nullptr);
     ~QJsonSchemaForm() override = default;
 
+    [[nodiscard]] QFormLayout *formLayout() const;
+    void setFormLayout(QFormLayout *);
+
     /// @brief 根据Json生成widgets
     /// @param[in] schema
-    /// @param[in,out] parent
-    void fromJsonSchema(const QJsonObject &schema, QJsonSchemaForm *parent);
+    void fromJsonSchema(const QJsonObject &schema);
     /// @brief
     /// @param[in] parent
     /// @return QJsonObject
