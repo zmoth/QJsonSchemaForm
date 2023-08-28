@@ -14,7 +14,7 @@
 QT_BEGIN_NAMESPACE
 
 /// @brief (vue-json-schema-form)[https://form.lljj.me/]
-class Q_WIDGETS_EXPORT QJsonSchemaForm : public QWidget
+class QJsonSchemaForm : public QWidget
 {
     Q_OBJECT
 

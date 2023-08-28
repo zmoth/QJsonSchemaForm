@@ -7,7 +7,6 @@ message(STATUS "${PROJECT_NAME} v${PROJECT_VERSION}")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -15,11 +14,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets) # 识别是Qt6还是Qt5
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
-file(GLOB_RECURSE CPP_SOURCE_FILES *.cpp *.cxx *.cc)
-file(GLOB_RECURSE CPP_INCLUDE_FILES *.hpp *.h)
-file(GLOB_RECURSE RESOURCES *.qrc *.rc *.ui)
-
-set(PROJECT_SOURCES ${CPP_SOURCE_FILES} ${CPP_INCLUDE_FILES} ${RESOURCES})
+file(GLOB_RECURSE SRCS *.cpp)
+file(GLOB_RECURSE INCS *.hpp *.h)
 
 # 添加配置头文件，将CMake中的版本等信息转换为头文件
 configure_file(
@@ -30,8 +26,8 @@ configure_file(
 # 制作可执行文件
 add_executable(
   ${PROJECT_NAME}
-  WIN32 # console
-  ${PROJECT_SOURCES}
+  ${SRCS}
+  ${INCS}
 )
 
 target_link_libraries(

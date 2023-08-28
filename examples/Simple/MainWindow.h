@@ -14,7 +14,6 @@ class MainWindow : public QMainWindow
 
   private:
     QJsonObject _schema{};
-    QString _str{};
 
     QJsonDocument _doc{};
 };

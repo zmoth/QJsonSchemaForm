@@ -29,12 +29,9 @@ message(STATUS "[${PROJECT_NAME}] 此CMakeLists.txt是否是顶层 ${PROJECT_IS_
 option(BUILD_EXAMPLES "是否编译例程" ${PROJECT_IS_TOP_LEVEL})
 option(BUILD_DEBUG_POSTFIX_D "是否需要添加后缀以区分是debug还是release" ${PROJECT_IS_TOP_LEVEL})
 
-set(CMAKE_CXX_STANDARD 17)
-
 # 如果此项目作为其他项目的第三方库，以下的配置不生效
 if(PROJECT_IS_TOP_LEVEL)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  set(CMAKE_INCLUDE_CURRENT_DIR ON)
+  set(CMAKE_CXX_STANDARD 17)
   set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
   set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 
@@ -108,7 +105,7 @@ set_target_properties(
 
 target_compile_options(
   ${PROJECT_NAME}
-  PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/utf-8>
+  PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/utf-8 /Zc:__cplusplus>
   PRIVATE $<$<C_COMPILER_ID:MSVC>:/utf-8>
 )
 

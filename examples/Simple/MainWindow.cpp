@@ -9,34 +9,26 @@
 #include "JsonHighlighter.h"
 #include "QJsonSchemaForm.h"
 
-static constexpr char text[] = R"(
-{
-    "type": "object",
-    "required": [
-        "string_1692183345223x0"
-    ],
-    "properties": {
-        "string_1692183345223x0": {
-            "title": "str",
-            "type": "string",
-            "ui:options": {
-                "placeholder": "请输入"
+const std::string jsonText = R"(
+    {
+        "type": "object",
+        "properties": {
+            "string_1692183345223x0": {
+                "title": "str",
+                "type": "string",
+                "ui:options": {
+                    "placeholder": "请输入"
+                }
             }
         }
-    },
-    "ui:order": [
-        "string_1692183345223x0"
-    ]
-}
+    }
 )";
 
 MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(parent, flags)
 {
-    _str = text;
-
-    QJsonDocument jsonDocument = QJsonDocument::fromJson(_str.toLocal8Bit().data());
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonText.data());
     if (jsonDocument.isNull()) {
-        qDebug() << "===> please check the string " << _str.toLocal8Bit().data();
+        qDebug() << "===> please check the string " << jsonText.data();
     }
     _schema = jsonDocument.object();
 
@@ -59,11 +51,11 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(par
     form->setObjectName("form");
     layout->addWidget(form);
 
-    // 数据更新会刷新表单
-    connect(jsonDataEditor, &QTextEdit::textChanged, form, &QJsonSchemaForm::changed);
-    // schema更新会更新表单绘制
-    connect(jsonSchemaEditor, &QTextEdit::textChanged, form, &QJsonSchemaForm::changed);
-    // 表单点击保存会更新数据区域
+    // // 数据更新会刷新表单
+    // connect(jsonDataEditor, &QTextEdit::textChanged, form, &QJsonSchemaForm::changed);
+    // // schema更新会更新表单绘制
+    // connect(jsonSchemaEditor, &QTextEdit::textChanged, form, &QJsonSchemaForm::changed);
+    // // 表单点击保存会更新数据区域
 
     show();
 }
