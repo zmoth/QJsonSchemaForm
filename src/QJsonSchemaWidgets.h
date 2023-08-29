@@ -1,88 +1,52 @@
 #ifndef QJSONSCHEMAWIDGETS_H
 #define QJSONSCHEMAWIDGETS_H
 
+#include <QJsonObject>
 #include <QWidget>
 
 QT_BEGIN_NAMESPACE
 
-class QJsonSchemaWidget
+class QCheckBox;
+
+class QJsonSchemaWidget : public QWidget
 {
   public:
-    explicit QJsonSchemaWidget(const QJsonObject &schema);
-    virtual ~QJsonSchemaWidget() = default;
+    explicit QJsonSchemaWidget(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    explicit QJsonSchemaWidget(const QJsonObject &schema,
+                               QWidget *parent = nullptr,
+                               Qt::WindowFlags f = Qt::WindowFlags());
+
+    ~QJsonSchemaWidget() override = default;
+
+    [[nodiscard]] inline QJsonObject jsonSchema() const { return schema; };
+    virtual void setJsonSchema(const QJsonObject &) = 0;
 
     virtual void data(const QJsonObject &jsonData) = 0;
+
+  Q_SIGNALS:
+    void changed(const QJsonObject &schema);
+    void update(const QJsonObject &data);
 
   public Q_SLOTS:
     void onChanged();
 
-  protected:
-    QString key;
+  public:
+    QJsonObject schema;
 };
 
-#include <QLineEdit>
-
-class QSchemaLineEdit
-    : public QJsonSchemaWidget
-    , public QLineEdit
+class QJsonSchemaBoolean : public QJsonSchemaWidget
 {
+    Q_OBJECT
+
   public:
-    // explicit QSchemaLineEdit(QWidget *parent = nullptr);
-    ~QSchemaLineEdit() override = default;
+    explicit QJsonSchemaBoolean(const QJsonObject &schema,
+                                QWidget *parent = nullptr,
+                                Qt::WindowFlags f = Qt::WindowFlags());
 
-    void data(const QJsonObject &jsonData) override;
-};
+    void setJsonSchema(const QJsonObject &s) override;
 
-#include <QTextEdit>
-
-class QSchemaTextEdit
-    : public QTextEdit
-    , public QJsonSchemaWidget
-{
-  public:
-};
-
-#include <QCheckBox>
-
-class QSchemaCheckBox
-    : public QCheckBox
-    , public QJsonSchemaWidget
-{
-  public:
-};
-
-#include <QSpinBox>
-
-class QSchemaSpinBox
-    : public QSpinBox
-    , public QJsonSchemaWidget
-{
-  public:
-};
-
-class QSchemaDoubleSpinBox
-    : public QDoubleSpinBox
-    , public QJsonSchemaWidget
-{
-  public:
-};
-
-#include <QSlider>
-
-class QSchemaSlider
-    : public QSlider
-    , public QJsonSchemaWidget
-{
-  public:
-};
-
-#include <QPushButton>
-
-class QSchemaPushButton
-    : public QPushButton
-    , public QJsonSchemaWidget
-{
-  public:
+  private:
+    QCheckBox *_checkBox{nullptr};
 };
 
 QT_END_NAMESPACE
