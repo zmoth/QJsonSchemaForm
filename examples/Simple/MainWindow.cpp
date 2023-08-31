@@ -11,17 +11,41 @@
 
 const std::string jsonText = R"(
     {
-        "type": "object",
-        "properties": {
-            "string_1692183345223x0": {
-                "title": "str",
-                "type": "string",
-                "ui:options": {
-                    "placeholder": "请输入"
-                }
+        "type" : "object",
+        "title" : "Boolean Widgets",
+        "properties" : {
+            "standard_boolean" :
+            {
+                "type" : "boolean",
+                "description" : "check this if you want it to be true",
+                "title" : "Boolean Field"
+            },
+            "default_value" :
+            {
+                "type" : "boolean",
+                "description" : "check this if you want it to be true",
+                "title" : "Default",
+                "default" : true
+            },
+            "switch" :
+            {
+                "type" : "boolean",
+                "ui:widget" : "switch",
+                "description" : "check this if you want it to be true",
+                "title" : "Switch"
+            },
+            "switch_default" :
+            {
+                "type" : "boolean",
+                "ui:widget" : "switch",
+                "description" : "check this if you want it to be true",
+                "title" : "Switch",
+                "default" : true
             }
-        }
+        },
+        "ui:order" : [ "standard_boolean", "default_value", "switch", "switch_default"]
     }
+
 )";
 
 MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(parent, flags)

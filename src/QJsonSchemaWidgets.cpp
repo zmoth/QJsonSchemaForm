@@ -638,7 +638,7 @@ void QJsonSchemaString::setValue(QString s)
 
 #pragma endregion /*string*/
 
-#pragma region /*boolean*/
+#pragma region /*QJsonSchemaBoolean*/
 
 QJsonSchemaBoolean::QJsonSchemaBoolean(QJsonSchemaWidget *parent) : QJsonSchemaWidget(parent)
 {
@@ -716,7 +716,7 @@ void QJsonSchemaBoolean::setValue(bool b)
     }
 }
 
-#pragma endregion /*boolean*/
+#pragma endregion /*QJsonSchemaBoolean*/
 
 #pragma region /*number*/
 
