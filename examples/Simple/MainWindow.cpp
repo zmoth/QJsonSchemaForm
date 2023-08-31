@@ -12,109 +12,94 @@
 const std::string jsonText = R"(
 {
   "type": "object",
-  "title": "Arrays",
   "ui:width": 500,
   "ui:height": 800,
+  "title": "Object types",
+
+  "$defs": {
+    "numbers": {
+      "type": "object",
+      "properties": {
+        "standard_float": {
+          "type": "number",
+          "description": "Standard floating point input"
+        },
+        "standard_integer": {
+          "type": "integer",
+          "description": "Standard integer input"
+        },
+        "integer_range": {
+          "type": "integer",
+          "ui:widget": "range",
+          "minimum": 10,
+          "maximum": 100,
+          "description": "Integer values clamped between 10 and 100"
+        },
+        "float_range": {
+          "type": "number",
+          "ui:widget": "range",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Float values clamped between 0 and 1"
+        }
+      }
+    },
+    "strings": {
+      "type": "object",
+      "properties": {
+        "standard_string": {
+          "type": "string",
+          "default": "default value",
+          "description": "Standard string input"
+        },
+        "string_choice": {
+          "type": "string",
+          "enum": [
+            "human",
+            "elf",
+            "dwarf",
+            "halfling",
+            "gnome",
+            "tiefling",
+            "dragonborn",
+            "tortle"
+          ],
+          "default": "dragonborn",
+          "description": "String choice with default value"
+        },
+        "string_color": {
+          "type": "string",
+          "ui:widget": "colour",
+          "default": "#FFAA00AA",
+          "description": "String color value"
+        },
+        "file_path": {
+          "type": "string",
+          "ui:widget": "file",
+          "description": "Choose a file"
+        },
+        "dir_path": {
+          "type": "string",
+          "ui:widget": "dir",
+          "description": "Choose a directory"
+        }
+      }
+    }
+  },
+
   "properties": {
-    "fixed_order": {
-      "type": "array",
-      "description": "Fixed Size array",
-      "title": "Fixed Size",
-      "ui:spacing": 0,
-      "ui:fixedOrder": true,
-      "items": [
-        { "type": "number", "default": 33 },
-        { "type": "number", "default": 44 },
-        { "type": "number", "default": 55 }
-      ]
+    "invisible": {
+      "type": "string",
+      "default": "This field is not visible in the UI",
+      "ui:visible": false
     },
-
-    "fixed_size": {
-      "type": "array",
-      "description": "Fixed Size array",
-      "title": "Fixed Size",
-      "ui:spacing": 0,
-      "items": [
-        { "type": "number", "default": 33 },
-        { "type": "number", "default": 44 },
-        { "type": "number", "default": 55 }
-      ]
+    "numbers": {
+      "$ref": "#/$defs/numbers",
+      "title": "Numbers"
     },
-
-    "growable_array": {
-      "type": "array",
-      "description": "this is a test",
-      "title": "Growable",
-      "ui:spacing": 0,
-      "additionalItems": [
-        {
-          "type": "number",
-          "title": "Number"
-        }
-      ]
-    },
-
-    "multiple_types": {
-      "type": "array",
-      "description": "Choose what type of",
-      "title": "Multi Growable",
-      "additionalItems": [
-        {
-          "type": "number",
-          "title": "Number"
-        },
-        {
-          "type": "integer",
-          "title": "Integer"
-        },
-        {
-          "type": "integer",
-          "title": "Integer Slider",
-          "ui:widget": "range"
-        },
-        {
-          "type": "string",
-          "title": "String"
-        },
-        {
-          "type": "string",
-          "title": "Directory",
-          "ui:widget": "dir"
-        },
-        {
-          "type": "string",
-          "title": "File",
-          "ui:widget": "file"
-        },
-        {
-          "type": "string",
-          "title": "Combo Box",
-          "enum": ["Choice 1", "Choice 2"]
-        },
-        {
-          "type": "boolean",
-          "title": "Boolean"
-        },
-        {
-          "type": "string",
-          "ui:widget": "color",
-          "title": "Color"
-        },
-        {
-          "type": "string",
-          "ui:widget": "date",
-          "title": "Date"
-        },
-        {
-          "title": "Object",
-          "type": "object",
-          "properties": {
-            "first_name": { "type": "string" },
-            "last_name": { "type": "string" }
-          },
-          "ui:order": ["first_name", "last_name"]
-        }
-      ]
+    "strings": {
+      "$ref": "#/$defs/strings",
+      "title": "Strings"
     }
   }
 }

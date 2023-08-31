@@ -23,7 +23,7 @@ class QJsonSchemaWidgetsFactory : public QObject
 
     [[nodiscard]] static QJsonObject getDef(const QJsonObject &schema, const QString &ref);
 
-    [[nodiscard]] static QJsonObject dereference(const QJsonObject &schema);
+    [[nodiscard]] static QJsonObject dereference(const QJsonObject &schema, QJsonSchemaWidget *widget);
 };
 
 }  // namespace QJsonSchemaForm

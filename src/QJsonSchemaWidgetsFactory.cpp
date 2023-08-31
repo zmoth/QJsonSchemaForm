@@ -14,11 +14,11 @@ static QJsonObject getRef(const QJsonObject &json, const QString &ref)
 
         auto it = json.find(key);
         if (it != json.end()) {
-            return getRef(it->toObject(), ref.mid(index));
+            return getRef(it->toObject(), ref.mid(index + 1));
         }
-
     } else {
         // 最后一个key
+        qDebug() << key;
         if (json.contains(key)) {
             return json.find(key)->toObject();
         }
@@ -27,35 +27,51 @@ static QJsonObject getRef(const QJsonObject &json, const QString &ref)
     return {};
 }
 
+static QJsonObject getParentSchema(QJsonSchemaWidget *widget)
+{
+    auto *w = dynamic_cast<QJsonSchemaWidget *>(widget->parentWidget());
+    if (!w) {
+        return {};
+    }
+
+    if (w->objectName() != "form") {
+        return getParentSchema(w);
+    }
+
+    return w->getSchema();
+}
+
 QJsonSchemaWidgetsFactory::QJsonSchemaWidgetsFactory(QObject *parent) : QObject(parent) {}
 
 QJsonSchemaWidget *QJsonSchemaWidgetsFactory::createWidget(const QJsonObject &schema, QJsonSchemaWidget *parent)
 {
-    if (!schema.contains("type")) {
-        qCritical() << "Formatting error! The \"type\" keyword does not exist!";
+    auto s = dereference(schema, parent);
+
+    if (!s.contains("type")) {
+        qCritical() << "Formatting error! The \"type\" keyword does not exist! " << s;
         return nullptr;
     }
 
-    auto type = schema["type"].toString();
+    auto type = s["type"].toString();
 
     if (type == "string") {
-        return new QJsonSchemaString(schema, parent);
+        return new QJsonSchemaString(s, parent);
     }
 
     if (type == "number" || type == "integer") {
-        return new QJsonSchemaNumber(schema, parent);
+        return new QJsonSchemaNumber(s, parent);
     }
 
     if (type == "object") {
-        return new QJsonSchemaObject(schema, parent);
+        return new QJsonSchemaObject(s, parent);
     }
 
     if (type == "array") {
-        return new QJsonSchemaArray(schema, parent);
+        return new QJsonSchemaArray(s, parent);
     }
 
     if (type == "boolean") {
-        return new QJsonSchemaBoolean(schema, parent);
+        return new QJsonSchemaBoolean(s, parent);
     }
 
     qWarning() << type << " is not exist!";
@@ -98,12 +114,12 @@ QJsonObject QJsonSchemaWidgetsFactory::getDef(const QJsonObject &schema, const Q
     return {};
 }
 
-QJsonObject QJsonSchemaWidgetsFactory::dereference(const QJsonObject &schema)
+QJsonObject QJsonSchemaWidgetsFactory::dereference(const QJsonObject &schema, QJsonSchemaWidget *widget)
 {
     if (schema.contains("$ref")) {
         QJsonObject j;
 
-        j = getDef(schema, schema.find("$ref")->toString());
+        j = getDef(getParentSchema(widget), schema.find("$ref")->toString());
 
         for (const auto &i : schema.keys()) {
             j[i] = schema[i];

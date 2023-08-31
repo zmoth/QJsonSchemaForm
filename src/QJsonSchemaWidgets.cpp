@@ -40,23 +40,6 @@ void QJsonSchemaWidget::setSchema(const QJsonObject &schema)
 {
     _schema = schema;  // 保存 schema
 
-    auto s = QJsonSchemaWidgetsFactory::dereference(_schema);
-
-    // auto parentSchema = [this]() {
-    //     if (auto *p = dynamic_cast<QJsonSchemaWidget *>(parentWidget())) {
-    //         if (p->_schema.contains("$ref")) {
-    //             auto schema = QJsonSchemaWidgetsFactory::dereference(_schema);
-    //         }
-    //     } else {
-    //     }
-    // };
-
-    // if (auto *p = dynamic_cast<QJsonSchemaWidget *>(parentWidget())) {
-    //     if (p->_schema.contains("$ref")) {
-    //         auto schema = QJsonSchemaWidgetsFactory::dereference(s);
-    //     }
-    // }
-
     processSchema(_schema);
 };
 
