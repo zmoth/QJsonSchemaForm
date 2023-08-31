@@ -91,7 +91,7 @@ class QJsonSchemaArray : public QJsonSchemaWidget
 
     void rebuild();
 
-    void pushBack(QJsonObject o);
+    void pushBack(const QJsonObject &o);
     QJsonArray oneOfArray;
     QComboBox *oneOf = nullptr;
     QToolButton *add = nullptr;
@@ -114,7 +114,7 @@ class QJsonSchemaString : public QJsonSchemaWidget
     void setSchema(const QJsonObject &s) override;
 
     [[nodiscard]] QJsonValue getValue() const override;
-    void setValue(QString s);
+    void setValue(const QString &) const;
 
     QComboBox *combo = nullptr;
     QLineEdit *widget = nullptr;
@@ -156,7 +156,7 @@ class QJsonSchemaNumber : public QJsonSchemaWidget
     void setSchema(const QJsonObject &s) override;
 
     [[nodiscard]] QJsonValue getValue() const override;
-    void setValue(double d);
+    void setValue(double);
 
   private:
     QWidget *_widget{nullptr};

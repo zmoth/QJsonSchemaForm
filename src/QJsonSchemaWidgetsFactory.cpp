@@ -38,5 +38,30 @@ QJsonSchemaWidget *QJsonSchemaWidgetsFactory::createWidget(const QJsonObject &sc
     return nullptr;
 }
 
+void QJsonSchemaWidgetsFactory::setValue(QJsonSchemaWidget *widget, const QJsonValue &value)
+{
+    if (auto *w = dynamic_cast<QJsonSchemaNumber *>(widget)) {
+        if (value.isDouble()) {
+            w->setValue(value.toDouble());
+        }
+    } else if (auto *w = dynamic_cast<QJsonSchemaString *>(widget)) {
+        if (value.isString()) {
+            w->setValue(value.toString());
+        }
+    } else if (auto *w = dynamic_cast<QJsonSchemaObject *>(widget)) {
+        if (value.isObject()) {
+            w->setValue(value.toObject());
+        }
+    } else if (auto *w = dynamic_cast<QJsonSchemaArray *>(widget)) {
+        if (value.isArray()) {
+            w->setValue(value.toArray());
+        }
+    } else if (auto *w = dynamic_cast<QJsonSchemaBoolean *>(widget)) {
+        if (value.isBool()) {
+            w->setValue(value.toBool());
+        }
+    }
+}
+
 }  // namespace QJsonSchemaForm
 QT_END_NAMESPACE

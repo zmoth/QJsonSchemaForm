@@ -165,35 +165,11 @@ QJsonValue QJsonSchemaObject::getValue() const
 
 void QJsonSchemaObject::setValue(const QJsonObject &json)
 {
-    auto setV = [](QJsonSchemaWidget *widget, const QJsonValue &value) {
-        if (auto *w = dynamic_cast<QJsonSchemaNumber *>(widget)) {
-            if (value.isDouble()) {
-                w->setValue(value.toDouble());
-            }
-        } else if (auto *w = dynamic_cast<QJsonSchemaString *>(widget)) {
-            if (value.isString()) {
-                w->setValue(value.toString());
-            }
-        } else if (auto *w = dynamic_cast<QJsonSchemaObject *>(widget)) {
-            if (value.isObject()) {
-                w->setValue(value.toObject());
-            }
-        } else if (auto *w = dynamic_cast<QJsonSchemaArray *>(widget)) {
-            if (value.isArray()) {
-                w->setValue(value.toArray());
-            }
-        } else if (auto *w = dynamic_cast<QJsonSchemaBoolean *>(widget)) {
-            if (value.isBool()) {
-                w->setValue(value.toBool());
-            }
-        }
-    };
-
     for (const auto &key : json.keys()) {
         if (widgetsMap.contains(key)) {
             // widgets.at(key).second->setValue(json[key]);
 
-            setV(widgetsMap[key].second, json[key]);
+            QJsonSchemaWidgetsFactory::setValue(widgetsMap[key].second, json[key]);
         }
     }
 }
@@ -256,7 +232,7 @@ QJsonSchemaArray::QJsonSchemaArray(const QJsonObject &schema, QJsonSchemaWidget 
     setSchema(schema);
 }
 
-void QJsonSchemaArray::pushBack(QJsonObject o)
+void QJsonSchemaArray::pushBack(const QJsonObject &o)
 {
     QJsonSchemaWidgetsFactory factory;
     auto *w = factory.createWidget(o, this);
@@ -451,35 +427,11 @@ QJsonValue QJsonSchemaArray::getValue() const
 
 void QJsonSchemaArray::setValue(QJsonArray data)
 {
-    auto setV = [](QJsonSchemaWidget *widget, const QJsonValue &value) {
-        if (auto *w = dynamic_cast<QJsonSchemaNumber *>(widget)) {
-            if (value.isDouble()) {
-                w->setValue(value.toDouble());
-            }
-        } else if (auto *w = dynamic_cast<QJsonSchemaString *>(widget)) {
-            if (value.isString()) {
-                w->setValue(value.toString());
-            }
-        } else if (auto *w = dynamic_cast<QJsonSchemaObject *>(widget)) {
-            if (value.isObject()) {
-                w->setValue(value.toObject());
-            }
-        } else if (auto *w = dynamic_cast<QJsonSchemaArray *>(widget)) {
-            if (value.isArray()) {
-                w->setValue(value.toArray());
-            }
-        } else if (auto *w = dynamic_cast<QJsonSchemaBoolean *>(widget)) {
-            if (value.isBool()) {
-                w->setValue(value.toBool());
-            }
-        }
-    };
-
     auto mm = std::min(static_cast<size_t>(data.size()), items.size());
-    for (size_t i = 0; i < mm; i++) {
+    for (int i = 0; i < mm; i++) {
         // items[i].widget->setValue(data[i]);
 
-        setV(items[i].widget, data[i]);
+        QJsonSchemaWidgetsFactory::setValue(items[i].widget, data[i]);
     }
 }
 
@@ -641,11 +593,11 @@ QJsonValue QJsonSchemaString::getValue() const
     return {};
 }
 
-void QJsonSchemaString::setValue(QString s)
+void QJsonSchemaString::setValue(const QString &v) const
 {
     if (combo) {
         for (int i = 0; i < combo->count(); i++) {
-            if (combo->itemText(i) == s) {
+            if (combo->itemText(i) == v) {
                 combo->setCurrentIndex(i);
                 break;
             }
@@ -653,11 +605,11 @@ void QJsonSchemaString::setValue(QString s)
     }
     if (dateEdit->isVisible()) {
         QDate d;
-        d = QDate::fromString(s, Qt::ISODate);
+        d = QDate::fromString(v, Qt::ISODate);
         dateEdit->setDate(d);
     } else {
         if (widget) {
-            widget->setText(s);
+            widget->setText(v);
         }
     }
 }
@@ -873,12 +825,12 @@ QJsonValue QJsonSchemaNumber::getValue() const
     return dynamic_cast<QDoubleSpinBox *>(_widget)->value();
 }
 
-void QJsonSchemaNumber::setValue(double b)
+void QJsonSchemaNumber::setValue(double v)
 {
     if (auto *combo = dynamic_cast<QComboBox *>(_widget)) {
-        combo->setCurrentIndex(static_cast<int>(b));
+        combo->setCurrentIndex(static_cast<int>(v));
     } else if (auto *box = dynamic_cast<QDoubleSpinBox *>(_widget)) {
-        box->setValue(b);
+        box->setValue(v);
     }
 }
 

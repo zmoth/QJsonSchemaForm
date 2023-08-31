@@ -8,7 +8,7 @@
 QT_BEGIN_NAMESPACE
 namespace QJsonSchemaForm {
 
-static QJsonObject getRef(QJsonObject const &J, std::string ref)
+static QJsonObject getRef(const QJsonObject &json, std::string ref)
 {
     {
         auto i = ref.begin();
@@ -17,14 +17,14 @@ static QJsonObject getRef(QJsonObject const &J, std::string ref)
         const QString key = std::string(i, j).c_str();
 
         if (j == ref.end()) {
-            if (J.contains(key)) {
-                return J.find(key)->toObject();
+            if (json.contains(key)) {
+                return json.find(key)->toObject();
             }
             return {};
         }
 
-        auto it = J.find(key);
-        if (it != J.end()) {
+        auto it = json.find(key);
+        if (it != json.end()) {
             return getRef(it->toObject(), std::string(j + 1, ref.end()));
         }
     }
@@ -63,7 +63,7 @@ void QJsonSchemaForm::setValue(const QJsonObject &json)
     return _widget->setValue(json);
 }
 
-QJsonObject QJsonSchemaForm::getDef(QString ref) const
+QJsonObject QJsonSchemaForm::getDef(const QString &ref) const
 {
     std::string r = ref.toStdString();
     if (r.size() > 2) {

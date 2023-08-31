@@ -17,7 +17,9 @@ class QJsonSchemaWidgetsFactory : public QObject
     explicit QJsonSchemaWidgetsFactory(QObject *parent = nullptr);
     ~QJsonSchemaWidgetsFactory() override = default;
 
-    QJsonSchemaWidget *createWidget(const QJsonObject &schema, QJsonSchemaWidget *parent = nullptr);
+    static QJsonSchemaWidget *createWidget(const QJsonObject &schema, QJsonSchemaWidget *parent = nullptr);
+
+    static void setValue(QJsonSchemaWidget *widget, const QJsonValue &value);
 };
 
 }  // namespace QJsonSchemaForm

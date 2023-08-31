@@ -47,7 +47,7 @@ class QJsonSchemaForm : public QJsonSchemaWidget
      *
      * ref = "#/key1/key2/key3"
      */
-    [[nodiscard]] QJsonObject getDef(QString ref) const;
+    [[nodiscard]] QJsonObject getDef(const QString &ref) const;
 
   private:
     QJsonObject _schema;
