@@ -1,64 +1,60 @@
-/// @file QJsonSchemaForm.h
-/// @author moth (QianMoth@qq.com)
-/// @brief
-/// @version 0.0.1
-/// @date 2023-08-16
-///
-/// @copyright Copyright (c) 2023
-///
-#ifndef QJSONSCHEMAFORM_H
-#define QJSONSCHEMAFORM_H
+#pragma once
 
-#include <QWidget>
+#include <qtconfigmacros.h>
+
+#include <QJsonObject>
+
+#include "QJsonSchemaWidgets.h"
 
 QT_BEGIN_NAMESPACE
+namespace QJsonSchemaForm {
 
-class QFormLayout;
-
-/// @brief (vue-json-schema-form)[https://form.lljj.me/]
-class QJsonSchemaForm : public QWidget
+/// @brief schema 表单
+class QJsonSchemaForm : public QJsonSchemaWidget
 {
     Q_OBJECT
 
   public:
-    using CreatorMap = QMap<QString, std::function<QWidget *()>>;
-
-    // static QJsonSchemaForm::CreatorMap cmap();
-
     explicit QJsonSchemaForm(QWidget *parent = nullptr);
     explicit QJsonSchemaForm(const QJsonObject &schema, QWidget *parent = nullptr);
     ~QJsonSchemaForm() override = default;
 
-    [[nodiscard]] QFormLayout *formLayout() const;
-    void setFormLayout(QFormLayout *);
+    /// @brief 获取json schema
+    /// @return const QJsonObject&
+    [[nodiscard]] inline QJsonObject getSchema() const { return _schema; }
+    /// @brief 设置json schema
+    /// @param[in] s schema
+    void setSchema(const QJsonObject &s) override;
 
-    /// @brief 根据Json生成widgets
-    /// @param[in] schema
-    void fromJsonSchema(const QJsonObject &schema);
-    /// @brief
-    /// @param[in] parent
+    /// @brief 获取表单内容 json格式
+    /// @return QJsonValue
+    [[nodiscard]] QJsonValue getValue() const override;
+    /// @brief 将json值解析到表单
+    /// @param[in] data
+    void setValue(const QJsonObject &json) override;
+
+    /// @brief 废弃
+    /// @param[in] JJ
     /// @return QJsonObject
-    QJsonObject toJsonSchema(QJsonSchemaForm *parent);
+    [[nodiscard]] QJsonObject dereference(QJsonObject jj) const;
 
-    // QWidget *createWidget(const QJsonObject &json, QWidget *parent = nullptr);
-
-    /// @brief
-    /// @param[in] json
-    void fromJson(const QJsonObject &json);
-    /// @brief
-    /// @return QJsonObject
-    [[nodiscard]] QJsonObject toJson() const;
-
-  Q_SIGNALS:
-    void changed();
-
-  private Q_SLOTS:
-    void _onOpen();
+    /**
+     * @brief getDef
+     * @param ref
+     * @return
+     *
+     * Gets an object using the following reference
+     *
+     * ref = "#/key1/key2/key3"
+     */
+    [[nodiscard]] QJsonObject getDef(QString ref) const;
 
   private:
-    Q_DISABLE_COPY(QJsonSchemaForm);
+    QJsonObject _schema;
+
+    // Form表单肯定是由一个Object构成的
+    QJsonSchemaWidget *_widget{nullptr};
 };
 
+}  // namespace QJsonSchemaForm
 QT_END_NAMESPACE
-
-#endif /*QJSONSCHEMAFORM_H*/

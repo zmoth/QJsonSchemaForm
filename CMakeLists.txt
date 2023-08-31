@@ -31,7 +31,7 @@ option(BUILD_DEBUG_POSTFIX_D "是否需要添加后缀以区分是debug还是rel
 
 # 如果此项目作为其他项目的第三方库，以下的配置不生效
 if(PROJECT_IS_TOP_LEVEL)
-  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD 20)
   set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
   set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 
@@ -55,7 +55,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets) # 识别是Qt6还是Qt5
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets)
 message(STATUS "[${PROJECT_NAME}] QT_VERSION: ${QT_VERSION}; QT_DIR: ${QT_DIR}")
 
 add_library(${PROJECT_NAME} SHARED)
@@ -77,6 +77,7 @@ generate_export_header(
 
 target_link_libraries(
   ${PROJECT_NAME}
+  PRIVATE Qt${QT_VERSION_MAJOR}::Core
   PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
 )
 
@@ -105,7 +106,7 @@ set_target_properties(
 
 target_compile_options(
   ${PROJECT_NAME}
-  PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/utf-8 /Zc:__cplusplus>
+  PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/utf-8>
   PRIVATE $<$<C_COMPILER_ID:MSVC>:/utf-8>
 )
 

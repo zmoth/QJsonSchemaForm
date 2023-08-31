@@ -7,7 +7,7 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug",
+      "name": "win gcc",
       "program": "${workspaceFolder}/build/bin/Simple.exe",
       "args": [],
       "cwd": "${workspaceFolder}/build/bin"
