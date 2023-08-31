@@ -36,6 +36,30 @@ QJsonSchemaWidget::QJsonSchemaWidget(QWidget *parent) : QWidget(parent)
     // setStyleSheet(QString::fromUtf8("border:3px solid blue"));
 }
 
+void QJsonSchemaWidget::setSchema(const QJsonObject &schema)
+{
+    _schema = schema;  // 保存 schema
+
+    auto s = QJsonSchemaWidgetsFactory::dereference(_schema);
+
+    // auto parentSchema = [this]() {
+    //     if (auto *p = dynamic_cast<QJsonSchemaWidget *>(parentWidget())) {
+    //         if (p->_schema.contains("$ref")) {
+    //             auto schema = QJsonSchemaWidgetsFactory::dereference(_schema);
+    //         }
+    //     } else {
+    //     }
+    // };
+
+    // if (auto *p = dynamic_cast<QJsonSchemaWidget *>(parentWidget())) {
+    //     if (p->_schema.contains("$ref")) {
+    //         auto schema = QJsonSchemaWidgetsFactory::dereference(s);
+    //     }
+    // }
+
+    processSchema(_schema);
+};
+
 #pragma endregion /*QJsonSchemaWidget*/
 
 #pragma region /*QJsonSchemaObject*/
@@ -51,11 +75,8 @@ QJsonSchemaObject::QJsonSchemaObject(const QJsonObject &schema, QJsonSchemaWidge
     setSchema(schema);
 }
 
-void QJsonSchemaObject::setSchema(const QJsonObject &s)
+void QJsonSchemaObject::processSchema(const QJsonObject &schema)
 {
-    // QJsonObject j = getParentForm()->dereference(s);
-    auto schema = s;
-
     auto *l = formLayout();
 
     // if (tabwidget) {
@@ -91,8 +112,7 @@ void QJsonSchemaObject::setSchema(const QJsonObject &s)
             }
 
             // 控件
-            QJsonSchemaWidgetsFactory factory;
-            auto *widget = factory.createWidget(prop, this);
+            auto *widget = QJsonSchemaWidgetsFactory::createWidget(prop, this);
             widget->setObjectName(key);
 
             // 是否显示
@@ -234,8 +254,7 @@ QJsonSchemaArray::QJsonSchemaArray(const QJsonObject &schema, QJsonSchemaWidget 
 
 void QJsonSchemaArray::pushBack(const QJsonObject &o)
 {
-    QJsonSchemaWidgetsFactory factory;
-    auto *w = factory.createWidget(o, this);
+    auto *w = QJsonSchemaWidgetsFactory::createWidget(o, this);
     auto *h = new QHBoxLayout();
 
     w->setSchema(o);
@@ -333,11 +352,8 @@ void QJsonSchemaArray::rebuild()
     }
 }
 
-void QJsonSchemaArray::setSchema(const QJsonObject &s)
+void QJsonSchemaArray::processSchema(const QJsonObject &schema)
 {
-    // QJsonObject j = getParentForm()->dereference(s);
-    auto schema = s;
-
     oneOf->setVisible(false);
     add->setVisible(false);
     fixedSize = true;
@@ -504,11 +520,8 @@ QJsonSchemaString::QJsonSchemaString(const QJsonObject &schema, QJsonSchemaWidge
     setSchema(schema);
 }
 
-void QJsonSchemaString::setSchema(const QJsonObject &s)
+void QJsonSchemaString::processSchema(const QJsonObject &schema)
 {
-    // QJsonObject j = getParentForm()->dereference(s);
-    auto schema = s;
-
     QString wid = "";
 
     QString defaultValue;
@@ -630,11 +643,8 @@ QJsonSchemaBoolean::QJsonSchemaBoolean(const QJsonObject &schema, QJsonSchemaWid
     setSchema(schema);
 }
 
-void QJsonSchemaBoolean::setSchema(const QJsonObject &s)
+void QJsonSchemaBoolean::processSchema(const QJsonObject &schema)
 {
-    // QJsonObject j = getParentForm()->dereference(s);
-    auto schema = s;
-
     bool def{false};
     {
         auto it = schema.find("default");
@@ -695,11 +705,8 @@ QJsonSchemaNumber::QJsonSchemaNumber(const QJsonObject &schema, QJsonSchemaWidge
     setSchema(schema);
 }
 
-void QJsonSchemaNumber::setSchema(const QJsonObject &s)
+void QJsonSchemaNumber::processSchema(const QJsonObject &schema)
 {
-    // auto schema = getParentForm()->dereference(s);
-    auto schema = s;
-
     auto min = static_cast<double>(std::numeric_limits<int>::lowest());
     auto max = static_cast<double>(std::numeric_limits<int>::max());
     double def = 0.0;

@@ -3,6 +3,30 @@
 QT_BEGIN_NAMESPACE
 namespace QJsonSchemaForm {
 
+static QJsonObject getRef(const QJsonObject &json, const QString &ref)
+{
+    QString key{ref};
+
+    auto index = ref.indexOf('/');
+    if (index != -1) {
+        key = ref.left(index);
+        qDebug() << key;
+
+        auto it = json.find(key);
+        if (it != json.end()) {
+            return getRef(it->toObject(), ref.mid(index));
+        }
+
+    } else {
+        // 最后一个key
+        if (json.contains(key)) {
+            return json.find(key)->toObject();
+        }
+    }
+
+    return {};
+}
+
 QJsonSchemaWidgetsFactory::QJsonSchemaWidgetsFactory(QObject *parent) : QObject(parent) {}
 
 QJsonSchemaWidget *QJsonSchemaWidgetsFactory::createWidget(const QJsonObject &schema, QJsonSchemaWidget *parent)
@@ -61,6 +85,34 @@ void QJsonSchemaWidgetsFactory::setValue(QJsonSchemaWidget *widget, const QJsonV
             w->setValue(value.toBool());
         }
     }
+}
+
+QJsonObject QJsonSchemaWidgetsFactory::getDef(const QJsonObject &schema, const QString &ref)
+{
+    if (ref.size() > 2) {
+        auto pos = ref.indexOf("#/");
+        if (pos == 0) {
+            return getRef(schema, ref.mid(2));
+        }
+    }
+    return {};
+}
+
+QJsonObject QJsonSchemaWidgetsFactory::dereference(const QJsonObject &schema)
+{
+    if (schema.contains("$ref")) {
+        QJsonObject j;
+
+        j = getDef(schema, schema.find("$ref")->toString());
+
+        for (const auto &i : schema.keys()) {
+            j[i] = schema[i];
+        }
+
+        return j;
+    }
+
+    return schema;
 }
 
 }  // namespace QJsonSchemaForm

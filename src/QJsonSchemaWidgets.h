@@ -2,6 +2,7 @@
 
 #include <map>
 #include <QJsonArray>
+#include <QJsonObject>
 #include <QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -28,9 +29,14 @@ class QJsonSchemaWidget : public QWidget
     explicit QJsonSchemaWidget(QWidget *parent = nullptr);
     ~QJsonSchemaWidget() override = default;
 
+    /// @brief 获取json schema
+    /// @return const QJsonObject&
+    [[nodiscard]] inline QJsonObject getSchema() const { return _schema; }
     /// @brief Schema生成Form
-    /// @param[in] s
-    virtual void setSchema(const QJsonObject &s) = 0;
+    /// @param[in] schema
+    void setSchema(const QJsonObject &schema);
+
+    virtual void processSchema(const QJsonObject &schema) = 0;
 
     /// @brief 由Form中控件的数据组成满足Schema规则的Json数据
     /// @return QJsonValue
@@ -39,6 +45,9 @@ class QJsonSchemaWidget : public QWidget
 
   Q_SIGNALS:
     void changed();
+
+  private:
+    QJsonObject _schema{};
 };
 
 /// @brief object类型
@@ -51,7 +60,7 @@ class QJsonSchemaObject : public QJsonSchemaWidget
     explicit QJsonSchemaObject(const QJsonObject &schema, QJsonSchemaWidget *parent = nullptr);
     ~QJsonSchemaObject() override = default;
 
-    void setSchema(const QJsonObject &s) override;
+    void processSchema(const QJsonObject &s) override;
 
     [[nodiscard]] QJsonValue getValue() const override;
     void setValue(const QJsonObject &json) override;
@@ -73,7 +82,7 @@ class QJsonSchemaArray : public QJsonSchemaWidget
     explicit QJsonSchemaArray(const QJsonObject &schema, QJsonSchemaWidget *parent = nullptr);
     ~QJsonSchemaArray() override = default;
 
-    void setSchema(const QJsonObject &s) override;
+    void processSchema(const QJsonObject &schema) override;
 
     [[nodiscard]] QJsonValue getValue() const override;
     void setValue(QJsonArray data);
@@ -111,7 +120,7 @@ class QJsonSchemaString : public QJsonSchemaWidget
     explicit QJsonSchemaString(const QJsonObject &schema, QJsonSchemaWidget *parent = nullptr);
     ~QJsonSchemaString() override = default;
 
-    void setSchema(const QJsonObject &s) override;
+    void processSchema(const QJsonObject &schema) override;
 
     [[nodiscard]] QJsonValue getValue() const override;
     void setValue(const QString &) const;
@@ -134,7 +143,7 @@ class QJsonSchemaBoolean : public QJsonSchemaWidget
     explicit QJsonSchemaBoolean(const QJsonObject &schema, QJsonSchemaWidget *parent = nullptr);
     ~QJsonSchemaBoolean() override = default;
 
-    void setSchema(const QJsonObject &s) override;
+    void processSchema(const QJsonObject &schema) override;
 
     [[nodiscard]] QJsonValue getValue() const override;
     void setValue(bool b);
@@ -153,7 +162,7 @@ class QJsonSchemaNumber : public QJsonSchemaWidget
     explicit QJsonSchemaNumber(const QJsonObject &schema, QJsonSchemaWidget *parent = nullptr);
     ~QJsonSchemaNumber() override = default;
 
-    void setSchema(const QJsonObject &s) override;
+    void processSchema(const QJsonObject &schema) override;
 
     [[nodiscard]] QJsonValue getValue() const override;
     void setValue(double);

@@ -20,6 +20,10 @@ class QJsonSchemaWidgetsFactory : public QObject
     static QJsonSchemaWidget *createWidget(const QJsonObject &schema, QJsonSchemaWidget *parent = nullptr);
 
     static void setValue(QJsonSchemaWidget *widget, const QJsonValue &value);
+
+    [[nodiscard]] static QJsonObject getDef(const QJsonObject &schema, const QString &ref);
+
+    [[nodiscard]] static QJsonObject dereference(const QJsonObject &schema);
 };
 
 }  // namespace QJsonSchemaForm
