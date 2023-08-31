@@ -11,6 +11,14 @@
       "program": "${workspaceFolder}/build/bin/Simple.exe",
       "args": [],
       "cwd": "${workspaceFolder}/build/bin"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "mac clang",
+      "program": "${workspaceFolder}/build/bin/Simple",
+      "args": [],
+      "cwd": "${workspaceFolder}/build/bin"
     }
   ]
 }

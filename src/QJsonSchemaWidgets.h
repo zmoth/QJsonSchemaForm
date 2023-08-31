@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <QJsonArray>
 #include <QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -12,6 +13,9 @@ class QCheckBox;
 class QAbstractButton;
 class QDateEdit;
 class QFormLayout;
+class QToolButton;
+class QListWidget;
+class QHBoxLayout;
 
 namespace QJsonSchemaForm {
 
@@ -59,43 +63,43 @@ class QJsonSchemaObject : public QJsonSchemaWidget
     std::map<QString, std::pair<QString, QJsonSchemaWidget *>> widgetsMap;
 };
 
-// /// @brief array类型
-// class QJsonSchemaArray : public QJsonSchemaWidget
-// {
-//     Q_OBJECT
+/// @brief array类型
+class QJsonSchemaArray : public QJsonSchemaWidget
+{
+    Q_OBJECT
 
-//   public:
-//     explicit QJsonSchemaArray(QJsonSchemaWidget *parent = nullptr);
-//     explicit QJsonSchemaArray(const QJsonObject &schema, QJsonSchemaWidget *parent = nullptr);
-//     ~QJsonSchemaArray() override = default;
+  public:
+    explicit QJsonSchemaArray(QJsonSchemaWidget *parent = nullptr);
+    explicit QJsonSchemaArray(const QJsonObject &schema, QJsonSchemaWidget *parent = nullptr);
+    ~QJsonSchemaArray() override = default;
 
-//     void setSchema(const QJsonObject &s) override;
+    void setSchema(const QJsonObject &s) override;
 
-//     [[nodiscard]] QJsonValue getValue() const override;
-//     void setValue(QJsonArray data);
+    [[nodiscard]] QJsonValue getValue() const override;
+    void setValue(QJsonArray data);
 
-//     struct IteT
-//     {
-//         QJsonSchemaWidget *widget;
-//         QHBoxLayout *layout;
-//         QToolButton *up;
-//         QToolButton *down;
-//         QToolButton *del;
-//     };
+    struct IteT
+    {
+        QJsonSchemaWidget *widget;
+        QHBoxLayout *layout;
+        QToolButton *up;
+        QToolButton *down;
+        QToolButton *del;
+    };
 
-//     std::vector<IteT> items;
+    std::vector<IteT> items;
 
-//     void rebuild();
+    void rebuild();
 
-//     void pushBack(QJsonObject o);
-//     QJsonArray oneOfArray;
-//     QComboBox *oneOf = nullptr;
-//     QToolButton *add = nullptr;
-//     QFormLayout *propertiesLayout = nullptr;
-//     QListWidget *listWidget = nullptr;
-//     bool fixedSize = false;
-//     bool fixedOrder = false;
-// };
+    void pushBack(QJsonObject o);
+    QJsonArray oneOfArray;
+    QComboBox *oneOf = nullptr;
+    QToolButton *add = nullptr;
+    QFormLayout *propertiesLayout = nullptr;
+    QListWidget *listWidget = nullptr;
+    bool fixedSize = false;
+    bool fixedOrder = false;
+};
 
 /// @brief 字符串
 class QJsonSchemaString : public QJsonSchemaWidget
@@ -136,8 +140,7 @@ class QJsonSchemaBoolean : public QJsonSchemaWidget
     void setValue(bool b);
 
   private:
-    QCheckBox *_widget = nullptr;
-    QAbstractButton *_switch = nullptr;
+    QAbstractButton *_switch{nullptr};
 };
 
 /// @brief 数字类型
@@ -154,6 +157,9 @@ class QJsonSchemaNumber : public QJsonSchemaWidget
 
     [[nodiscard]] QJsonValue getValue() const override;
     void setValue(double d);
+
+  private:
+    QWidget *_widget{nullptr};
 };
 
 }  // namespace QJsonSchemaForm

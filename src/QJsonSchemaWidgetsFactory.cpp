@@ -13,7 +13,6 @@ QJsonSchemaWidget *QJsonSchemaWidgetsFactory::createWidget(const QJsonObject &sc
     }
 
     auto type = schema["type"].toString();
-    qDebug() << type;
 
     if (type == "string") {
         return new QJsonSchemaString(schema, parent);
@@ -27,14 +26,15 @@ QJsonSchemaWidget *QJsonSchemaWidgetsFactory::createWidget(const QJsonObject &sc
         return new QJsonSchemaObject(schema, parent);
     }
 
-    // if (type == "array") {
-    //     widget = new QJsonSchemaArray(prop, this);
-    // }
+    if (type == "array") {
+        return new QJsonSchemaArray(schema, parent);
+    }
 
     if (type == "boolean") {
         return new QJsonSchemaBoolean(schema, parent);
     }
 
+    qWarning() << type << " is not exist!";
     return nullptr;
 }
 

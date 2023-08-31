@@ -20,12 +20,13 @@ class ToggleSwitch : public QAbstractButton
 
     [[nodiscard]] QSize sizeHint() const override;
 
+  public Q_SLOTS:
+    void setChecked(bool checked);
+
   protected:
     void paintEvent(QPaintEvent * /*event*/) override;
     void resizeEvent(QResizeEvent * /*event*/) override;
     void mouseReleaseEvent(QMouseEvent * /*event*/) override;
-    // void enterEvent(QEvent *event) override;
-    void setChecked(bool checked);
 
     [[nodiscard]] int offset() const;
     void setOffset(int value);

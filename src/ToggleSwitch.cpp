@@ -9,7 +9,6 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 
-
 QT_BEGIN_NAMESPACE
 namespace QJsonSchemaForm {
 
@@ -71,6 +70,12 @@ QSize ToggleSwitch::sizeHint() const
     const int h = _trackRadius * 2 + 2 * _margin;
 
     return {w, h};
+}
+
+void ToggleSwitch::setChecked(bool checked)
+{
+    _offset = _endOffset.value(checked);
+    QAbstractButton::setChecked(checked);
 }
 
 void ToggleSwitch::paintEvent(QPaintEvent * /*event*/)
@@ -145,18 +150,6 @@ void ToggleSwitch::mouseReleaseEvent(QMouseEvent *e)
         _animation->setEndValue(_endOffset[isChecked()]);
         _animation->start();
     }
-}
-
-// void ToggleSwitch::enterEvent(QEvent * event)
-// {
-//     setCursor(Qt::PointingHandCursor);
-//     QAbstractButton::enterEvent(event);
-// }
-
-void ToggleSwitch::setChecked(bool checked)
-{
-    QAbstractButton::setChecked(checked);
-    _offset = _endOffset.value(checked);
 }
 
 int ToggleSwitch::offset() const
