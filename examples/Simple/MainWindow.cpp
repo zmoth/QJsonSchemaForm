@@ -140,7 +140,6 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(par
             // 将表单上的数值转换为json传入插件
             const auto &json = body->getValue();
             jsonDataEditor->setText(QJsonDocument(json.toObject()).toJson());
-            qInfo() << json;
         });
         formLayout->addWidget(body);
 
@@ -156,22 +155,10 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(par
                 body->setValue(obj);
             });
             buttonLayout->addWidget(reloadButton);
-
-            // 保存按钮
-            auto *saveButton = new QPushButton(tr("save"), form);
-            connect(saveButton, &QPushButton::clicked, [this, body, jsonDataEditor]() {
-                // 将表单上的数值转换为json传入插件
-                const auto &json = body->getValue();
-                jsonDataEditor->setText(QJsonDocument(json.toObject()).toJson());
-                qInfo() << json;
-            });
-            buttonLayout->addWidget(saveButton);
         }
     }
 
     layout->addWidget(form);
-
-    // connect(form, &QJsonSchemaForm::QJsonSchemaForm::changed, [form]() { qInfo() << form->getValue(); });
 
     show();
 }

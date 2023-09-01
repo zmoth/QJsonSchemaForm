@@ -54,28 +54,31 @@ QJsonSchemaWidget *QJsonSchemaWidgetsFactory::createWidget(const QJsonObject &sc
 
     auto type = s["type"].toString();
 
+    QJsonSchemaWidget *w{nullptr};
+
     if (type == "string") {
-        return new QJsonSchemaString(s, parent);
+        w = new QJsonSchemaString(s, parent);
+    } else if (type == "number" || type == "integer") {
+        w = new QJsonSchemaNumber(s, parent);
+    } else if (type == "object") {
+        w = new QJsonSchemaObject(s, parent);
+    } else if (type == "array") {
+        w = new QJsonSchemaArray(s, parent);
+    } else if (type == "boolean") {
+        w = new QJsonSchemaBoolean(s, parent);
+    } else {
+        qWarning() << type << " is not exist!";
+        return nullptr;
     }
 
-    if (type == "number" || type == "integer") {
-        return new QJsonSchemaNumber(s, parent);
-    }
+    // 将子类的改变传递给父类
+    connect(w, &QJsonSchemaWidget::changed, [parent]() {
+        if (auto *p = dynamic_cast<QJsonSchemaWidget *>(parent)) {
+            Q_EMIT p->changed();
+        }
+    });
 
-    if (type == "object") {
-        return new QJsonSchemaObject(s, parent);
-    }
-
-    if (type == "array") {
-        return new QJsonSchemaArray(s, parent);
-    }
-
-    if (type == "boolean") {
-        return new QJsonSchemaBoolean(s, parent);
-    }
-
-    qWarning() << type << " is not exist!";
-    return nullptr;
+    return w;
 }
 
 void QJsonSchemaWidgetsFactory::setValue(QJsonSchemaWidget *widget, const QJsonValue &value)
