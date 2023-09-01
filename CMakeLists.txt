@@ -58,7 +58,7 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets) # 识别是Qt6还是Q
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets)
 message(STATUS "[${PROJECT_NAME}] QT_VERSION: ${QT_VERSION}; QT_DIR: ${QT_DIR}")
 
-add_library(${PROJECT_NAME} SHARED)
+add_library(${PROJECT_NAME} OBJECT)
 
 add_subdirectory(src)
 
