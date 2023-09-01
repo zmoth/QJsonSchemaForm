@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 
 #include <QBoxLayout>
+#include <QDockWidget>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QPushButton>
@@ -110,24 +111,23 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(par
     }
     _schema = jsonDocument.object();
 
-    // 为主窗口添加一个布局，以容纳json编辑器和Form窗口
-    auto *w = new QWidget(this);
-    w->setMinimumHeight(500);
-    auto *layout = new QHBoxLayout(w);
-    setCentralWidget(w);
-
-    // json 数据区域
-    auto *jsonDataEditor = new QTextEdit(this);
-    layout->addWidget(jsonDataEditor);
-
     // json schema 区域
-    auto *jsonSchemaEditor = new QTextEdit(this);
+    auto *jsonSchemaEditorDock = new QDockWidget("JsonSchema", this);
+    addDockWidget(Qt::RightDockWidgetArea, jsonSchemaEditorDock);
+    auto *jsonSchemaEditor = new QTextEdit(jsonSchemaEditorDock);
+    jsonSchemaEditorDock->setWidget(jsonSchemaEditor);
     jsonSchemaEditor->setText(QJsonDocument(_schema).toJson(QJsonDocument::Indented));
     auto *highlighter = new JsonHighlighter(jsonSchemaEditor->document());
-    layout->addWidget(jsonSchemaEditor);
+
+    // json 数据区域
+    auto *jsonDataEditorDock = new QDockWidget("JsonData", this);
+    addDockWidget(Qt::LeftDockWidgetArea, jsonDataEditorDock);
+    auto *jsonDataEditor = new QTextEdit(jsonDataEditorDock);
+    jsonDataEditorDock->setWidget(jsonDataEditor);
 
     // 表单绘制区域
-    auto *form = new QWidget();
+    auto *form = new QWidget(this);
+    setCentralWidget(form);
     auto *formLayout = new QVBoxLayout(form);
     {
         auto *body = new QJsonSchemaForm::QJsonSchemaForm(_schema, form);
@@ -157,8 +157,6 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags) : QMainWindow(par
             buttonLayout->addWidget(reloadButton);
         }
     }
-
-    layout->addWidget(form);
 
     show();
 }
