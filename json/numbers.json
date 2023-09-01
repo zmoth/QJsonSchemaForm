@@ -1,0 +1,54 @@
+{
+  "type": "object",
+  "title": "Number Widgets",
+  "properties": {
+    "standard_float": {
+      "title": "Standard Float",
+      "type": "number",
+      "description": "Standard floating point input",
+      "default": 3.145
+    },
+    "standard_integer": {
+      "title": "Integer",
+      "type": "integer",
+      "description": "Standard integer input",
+      "default": 66
+    },
+    "integer_range": {
+      "title": "Slider Integer",
+      "type": "integer",
+      "ui:widget": "range",
+      "minimum": -10,
+      "maximum": 10,
+      "description": "Integer values clamped between 10 and 100",
+      "default": 45
+    },
+    "float_range": {
+      "title": "Slider Float",
+      "type": "number",
+      "ui:widget": "range",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Float values clamped between 0 and 1",
+      "default": 0.4
+    },
+    "type": {
+      "type": "number",
+      "enum": [0, 1, 2, 3, 4],
+      "enumNames": [
+        "THRESH_BINARY",
+        "THRESH_BINARY_INV",
+        "THRESH_TRUNC",
+        "THRESH_TOZERO",
+        "THRESH_TOZERO_INV"
+      ]
+    }
+  },
+  "ui:order": [
+    "standard_float",
+    "standard_integer",
+    "integer_range",
+    "float_range",
+    "type"
+  ]
+}

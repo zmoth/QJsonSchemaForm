@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     qSetMessagePattern(
-        "[%{time yyyyMMdd h:mm:ss.zzz}] [%{time process}] "
+        "[%{time yyyy-MM-dd h:mm:ss.zzz}] [%{time process}] "
         "[%{if-debug}D%{endif}%{if-info}I%{endif}%{if-warning}W%{endif}%{if-critical}C%{"
         "endif}%{if-fatal}F%{endif}]: %{message}\t| (%{function}) [%{file}:%{line}]");
 

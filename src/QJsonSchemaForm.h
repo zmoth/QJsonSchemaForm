@@ -1,59 +1,39 @@
-/// @file QJsonSchemaForm.h
-/// @author moth (QianMoth@qq.com)
-/// @brief
-/// @version 0.0.1
-/// @date 2023-08-16
-///
-/// @copyright Copyright (c) 2023
-///
-#ifndef QJSONSCHEMAFORM_H
-#define QJSONSCHEMAFORM_H
+#pragma once
 
-#include <QWidget>
+#include <qtconfigmacros.h>
+
+#include <QJsonObject>
+
+#include "QJsonSchemaWidgets.h"
 
 QT_BEGIN_NAMESPACE
+namespace QJsonSchemaForm {
 
-/// @brief (vue-json-schema-form)[https://form.lljj.me/]
-class Q_WIDGETS_EXPORT QJsonSchemaForm : public QWidget
+/// @brief schema 表单
+class QJsonSchemaForm : public QJsonSchemaWidget
 {
     Q_OBJECT
 
   public:
-    using CreatorMap = QMap<QString, std::function<QWidget *()>>;
-
-    // static QJsonSchemaForm::CreatorMap cmap();
-
+    explicit QJsonSchemaForm(QWidget *parent = nullptr);
     explicit QJsonSchemaForm(const QJsonObject &schema, QWidget *parent = nullptr);
     ~QJsonSchemaForm() override = default;
 
-    /// @brief 根据Json生成widgets
-    /// @param[in] schema
-    /// @param[in,out] parent
-    void fromJsonSchema(const QJsonObject &schema, QJsonSchemaForm *parent);
-    /// @brief
-    /// @param[in] parent
-    /// @return QJsonObject
-    QJsonObject toJsonSchema(QJsonSchemaForm *parent);
+    /// @brief 设置json schema
+    /// @param[in] s schema
+    void processSchema(const QJsonObject &s) override;
 
-    // QWidget *createWidget(const QJsonObject &json, QWidget *parent = nullptr);
-
-    /// @brief
-    /// @param[in] json
-    void fromJson(const QJsonObject &json);
-    /// @brief
-    /// @return QJsonObject
-    [[nodiscard]] QJsonObject toJson() const;
-
-  Q_SIGNALS:
-    void changed();
-
-  private Q_SLOTS:
-    void _onOpen();
+    /// @brief 获取表单内容 json格式
+    /// @return QJsonValue
+    [[nodiscard]] QJsonValue getValue() const override;
+    /// @brief 将json值解析到表单
+    /// @param[in] data
+    void setValue(const QJsonObject &json) override;
 
   private:
-    Q_DISABLE_COPY(QJsonSchemaForm);
+    // Form表单肯定是由一个Object构成的
+    QJsonSchemaWidget *_widget{nullptr};
 };
 
+}  // namespace QJsonSchemaForm
 QT_END_NAMESPACE
-
-#endif /*QJSONSCHEMAFORM_H*/

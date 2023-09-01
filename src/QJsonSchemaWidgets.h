@@ -1,90 +1,179 @@
-#ifndef QJSONSCHEMAWIDGETS_H
-#define QJSONSCHEMAWIDGETS_H
+#pragma once
 
+#include <map>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QWidget>
 
 QT_BEGIN_NAMESPACE
 
-class QJsonSchemaWidget
+class QComboBox;
+class QLineEdit;
+class QPushButton;
+class QCheckBox;
+class QAbstractButton;
+class QDateEdit;
+class QFormLayout;
+class QToolButton;
+class QListWidget;
+class QHBoxLayout;
+
+namespace QJsonSchemaForm {
+
+/// @brief Schema控件基类
+class QJsonSchemaWidget : public QWidget
 {
+    Q_OBJECT
+
   public:
-    explicit QJsonSchemaWidget(const QJsonObject &schema);
-    virtual ~QJsonSchemaWidget() = default;
+    explicit QJsonSchemaWidget(QWidget *parent = nullptr);
+    ~QJsonSchemaWidget() override = default;
 
-    virtual void data(const QJsonObject &jsonData) = 0;
+    /// @brief 获取json schema
+    /// @return const QJsonObject&
+    [[nodiscard]] inline QJsonObject getSchema() const { return _schema; }
+    /// @brief Schema生成Form
+    /// @param[in] schema
+    void setSchema(const QJsonObject &schema);
 
-  public Q_SLOTS:
-    void onChanged();
+    virtual void processSchema(const QJsonObject &schema) = 0;
 
-  protected:
-    QString key;
+    /// @brief 由Form中控件的数据组成满足Schema规则的Json数据
+    /// @return QJsonValue
+    [[nodiscard]] virtual QJsonValue getValue() const = 0;
+    virtual void setValue(const QJsonObject & /*json*/){};
+
+  Q_SIGNALS:
+    void changed();
+
+  private:
+    QJsonObject _schema{};
 };
 
-#include <QLineEdit>
-
-class QSchemaLineEdit
-    : public QJsonSchemaWidget
-    , public QLineEdit
+/// @brief object类型
+class QJsonSchemaObject : public QJsonSchemaWidget
 {
-  public:
-    // explicit QSchemaLineEdit(QWidget *parent = nullptr);
-    ~QSchemaLineEdit() override = default;
+    Q_OBJECT
 
-    void data(const QJsonObject &jsonData) override;
+  public:
+    explicit QJsonSchemaObject(QWidget *parent = nullptr);
+    explicit QJsonSchemaObject(const QJsonObject &schema, QWidget *parent = nullptr);
+    ~QJsonSchemaObject() override = default;
+
+    void processSchema(const QJsonObject &schema) override;
+
+    /// @brief 生成一个基于object的form表单
+    /// @param[in] schema
+    void setOneOf(const QJsonObject &schema);
+
+    [[nodiscard]] QJsonValue getValue() const override;
+    void setValue(const QJsonObject &json) override;
+
+    [[nodiscard]] QFormLayout *formLayout() const;
+    void setFormLayout(QFormLayout *layout);
+
+    // object 必定存在 properties，内容是其他控件
+    std::map<QString, std::pair<QString, QJsonSchemaWidget *>> widgetsMap;
 };
 
-#include <QTextEdit>
-
-class QSchemaTextEdit
-    : public QTextEdit
-    , public QJsonSchemaWidget
+/// @brief array类型
+class QJsonSchemaArray : public QJsonSchemaWidget
 {
+    Q_OBJECT
+
   public:
+    explicit QJsonSchemaArray(QWidget *parent = nullptr);
+    explicit QJsonSchemaArray(const QJsonObject &schema, QWidget *parent = nullptr);
+    ~QJsonSchemaArray() override = default;
+
+    void processSchema(const QJsonObject &schema) override;
+
+    [[nodiscard]] QJsonValue getValue() const override;
+    void setValue(QJsonArray data);
+
+    struct IteT
+    {
+        QJsonSchemaWidget *widget;
+        QHBoxLayout *layout;
+        QToolButton *up;
+        QToolButton *down;
+        QToolButton *del;
+    };
+
+    std::vector<IteT> items;
+
+    void rebuild();
+
+    void pushBack(const QJsonObject &o);
+    QJsonArray oneOfArray;
+    QComboBox *oneOf = nullptr;
+    QToolButton *add = nullptr;
+    QFormLayout *propertiesLayout = nullptr;
+    QListWidget *listWidget = nullptr;
+    bool fixedSize = false;
+    bool fixedOrder = false;
 };
 
-#include <QCheckBox>
-
-class QSchemaCheckBox
-    : public QCheckBox
-    , public QJsonSchemaWidget
+/// @brief 字符串
+class QJsonSchemaString : public QJsonSchemaWidget
 {
+    Q_OBJECT
+
   public:
+    explicit QJsonSchemaString(QWidget *parent = nullptr);
+    explicit QJsonSchemaString(const QJsonObject &schema, QWidget *parent = nullptr);
+    ~QJsonSchemaString() override = default;
+
+    void processSchema(const QJsonObject &schema) override;
+
+    [[nodiscard]] QJsonValue getValue() const override;
+    void setValue(const QString &) const;
+
+    QComboBox *combo = nullptr;
+    QLineEdit *widget = nullptr;
+    QPushButton *fileButton = nullptr;
+    QPushButton *dirButton = nullptr;
+    QPushButton *colorButton = nullptr;
+    QDateEdit *dateEdit = nullptr;
 };
 
-#include <QSpinBox>
-
-class QSchemaSpinBox
-    : public QSpinBox
-    , public QJsonSchemaWidget
+/// @brief 布尔
+class QJsonSchemaBoolean : public QJsonSchemaWidget
 {
+    Q_OBJECT
+
   public:
+    explicit QJsonSchemaBoolean(QWidget *parent = nullptr);
+    explicit QJsonSchemaBoolean(const QJsonObject &schema, QWidget *parent = nullptr);
+    ~QJsonSchemaBoolean() override = default;
+
+    void processSchema(const QJsonObject &schema) override;
+
+    [[nodiscard]] QJsonValue getValue() const override;
+    void setValue(bool b);
+
+  private:
+    QAbstractButton *_switch{nullptr};
 };
 
-class QSchemaDoubleSpinBox
-    : public QDoubleSpinBox
-    , public QJsonSchemaWidget
+/// @brief 数字类型
+class QJsonSchemaNumber : public QJsonSchemaWidget
 {
+    Q_OBJECT
+
   public:
+    explicit QJsonSchemaNumber(QWidget *parent = nullptr);
+    explicit QJsonSchemaNumber(const QJsonObject &schema, QWidget *parent = nullptr);
+    ~QJsonSchemaNumber() override = default;
+
+    void processSchema(const QJsonObject &schema) override;
+
+    [[nodiscard]] QJsonValue getValue() const override;
+    void setValue(double);
+
+  private:
+    QWidget *_widget{nullptr};
 };
 
-#include <QSlider>
-
-class QSchemaSlider
-    : public QSlider
-    , public QJsonSchemaWidget
-{
-  public:
-};
-
-#include <QPushButton>
-
-class QSchemaPushButton
-    : public QPushButton
-    , public QJsonSchemaWidget
-{
-  public:
-};
-
+}  // namespace QJsonSchemaForm
 QT_END_NAMESPACE
-
-#endif /*QJSONSCHEMAWIDGETS_H*/

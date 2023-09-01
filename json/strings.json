@@ -1,0 +1,54 @@
+{
+  "type": "object",
+  "title": "String Widgets",
+  "properties": {
+    "standard_string": {
+      "title": "Standard String",
+      "type": "string",
+      "default": "default value",
+      "description": "Standard string input"
+    },
+    "string_choice": {
+      "title": "Choice",
+      "type": "string",
+      "enum": [
+        "human",
+        "elf",
+        "dwarf",
+        "halfling",
+        "gnome",
+        "tiefling",
+        "dragonborn",
+        "tortle"
+      ],
+      "default": "dragonborn",
+      "description": "String choice with default value"
+    },
+    "string_color": {
+      "title": "Color",
+      "type": "string",
+      "ui:widget": "colour",
+      "default": "#FFAA00AA",
+      "description": "String color value"
+    },
+    "file_path": {
+      "title": "File Path",
+      "type": "string",
+      "ui:widget": "file",
+      "description": "Choose a file"
+    },
+    "dir_path": {
+      "title": "Directory Path",
+      "type": "string",
+      "ui:widget": "dir",
+      "description": "Choose a directory"
+    },
+    "date": {
+      "title": "Date",
+      "type": "string",
+      "ui:widget": "date",
+      "default": "2020-12-25",
+      "description": "Select a date"
+    }
+  }
+}

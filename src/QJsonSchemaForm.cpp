@@ -1,159 +1,40 @@
 #include "QJsonSchemaForm.h"
 
-#include <functional>
+#include <iostream>
 #include <QBoxLayout>
-#include <QComboBox>
-#include <QFileDialog>
-#include <QFormLayout>
-#include <QJsonObject>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QSpinBox>
 
-#include "QJsonSchemaWidgets.h"
+#include "QJsonSchemaWidgetsFactory.h"
 
 QT_BEGIN_NAMESPACE
+namespace QJsonSchemaForm {
 
-QJsonSchemaForm::QJsonSchemaForm(const QJsonObject &schema, QWidget *parent) : QWidget(parent)
+QJsonSchemaForm::QJsonSchemaForm(QWidget *parent) : QJsonSchemaWidget(parent)
 {
-    fromJsonSchema(schema, this);
+    setObjectName("form");
+
+    auto *layout = new QVBoxLayout(this);
 }
 
-// QJsonSchemaForm::CreatorMap QJsonSchemaForm::cmap()
-// {
-//     static CreatorMap m{{"a", [] { return new QSchemaLineEdit(); }}};
-//     return m;
-// }
-
-void QJsonSchemaForm::fromJsonSchema(const QJsonObject &schema, QJsonSchemaForm *parent)
+QJsonSchemaForm::QJsonSchemaForm(const QJsonObject &schema, QWidget *parent) : QJsonSchemaForm(parent)
 {
-    if (!schema.contains("properties")) {
-        return;  // 错误
-    }
-
-    auto *layout = new QFormLayout(parent);
-    layout->setRowWrapPolicy(QFormLayout::WrapAllRows);  // 设置表单中的标签都位于控件的上方
-
-    // 解析schema生成表单控件
-
-    // title
-    if (schema.contains("title")) {
-        parent->setWindowTitle(schema["title"].toString());
-    }
-
-    auto properties = schema["properties"].toObject();
-    for (auto it = properties.begin(); it != properties.end(); ++it) {
-        QString key = it.key();
-        QJsonObject prop = it.value().toObject();
-
-        // auto *wid = createWidget(prop, parent);
-        // if (prop.contains("title")) {
-        //     layout->addRow(prop["title"].toString(), wid);
-        // } else {
-        //     layout->addRow(key, wid);
-        // }
-
-        if (prop["type"] == "string") {
-            if (prop.contains("ui:widget") && prop["ui:widget"] == "UploadWidget") {
-                auto *uploadButton = new QPushButton(tr("Upload"), parent);
-                uploadButton->setObjectName(key);
-                connect(uploadButton, &QPushButton::clicked, this, &QJsonSchemaForm::_onOpen);
-            } else {
-                auto *lineEdit = new QLineEdit(parent);
-                lineEdit->setObjectName(key);
-                layout->addRow(prop["title"].toString(), lineEdit);
-
-                if (prop.contains("minLength")) {
-                    // 最小长度
-                }
-                if (prop.contains("maxLength")) {
-                    // 最大长度
-                    lineEdit->setMaxLength(prop["maxLength"].toInt());
-                }
-                if (prop.contains("pattern")) {
-                    // 正则表达式
-                }
-            }
-        } else if (prop["type"] == "integer") {
-            if (prop.contains("enum")) {
-                auto *comboBox = new QComboBox(parent);
-                comboBox->setObjectName(key);
-                layout->addRow(prop["title"].toString(), comboBox);
-            } else {
-                auto *spinBox = new QSpinBox(parent);
-                spinBox->setObjectName(key);
-                layout->addRow(prop["title"].toString(), spinBox);
-            }
-        }
-
-        // 添加其他类型控件
-    }
+    setSchema(schema);
 }
 
-QJsonObject QJsonSchemaForm::toJsonSchema([[maybe_unused]] QJsonSchemaForm *parent)
+void QJsonSchemaForm::processSchema(const QJsonObject &s)
 {
-    return {};
+    _widget = QJsonSchemaWidgetsFactory::createWidget(s, this);
+    layout()->addWidget(_widget);
 }
 
-// QWidget *QJsonSchemaForm::createWidget(const QJsonObject &json, QWidget *parent)
-// {
-//     auto *w = cmap()[json["type"].toString()]();
-
-//     return w;
-// }
-
-QJsonObject QJsonSchemaForm::toJson() const
+QJsonValue QJsonSchemaForm::getValue() const
 {
-    QJsonObject json;
-
-    for (auto *obj : children()) {
-        if (obj->objectName().isEmpty()) {
-            continue;
-        }
-
-        // qInfo() << QObject::metatype()->typeName() << " " << obj->objectName();
-        const QString &typeName = QString::fromUtf8(obj->metaObject()->metaType().name());
-        if (typeName == "QLineEdit") {
-            auto *lineEdit = qobject_cast<QLineEdit *>(obj);
-            json[obj->objectName()] = lineEdit->text();
-        }
-    }
-    return json;
+    return _widget->getValue();
 }
 
-void QJsonSchemaForm::fromJson(const QJsonObject &json)
+void QJsonSchemaForm::setValue(const QJsonObject &json)
 {
-    for (auto *obj : children()) {
-        if (obj->objectName().isEmpty()) {
-            continue;
-        }
-
-        // qInfo() << QObject::metatype()->typeName() << " " << obj->objectName();
-        const QString &typeName = QString::fromUtf8(obj->metaObject()->metaType().name());
-        if (typeName == "QLineEdit") {
-            auto *lineEdit = qobject_cast<QLineEdit *>(obj);
-
-            lineEdit->setText(json[obj->objectName()].toString());
-        }
-    }
+    return _widget->setValue(json);
 }
 
-void QJsonSchemaForm::_onOpen()
-{
-    const QString fileName =
-        QFileDialog::getOpenFileName(this, tr("Open Flow"), QDir::currentPath(), tr("Flow Files (*.flow)"));
-
-    if (!QFileInfo::exists(fileName)) {
-        qWarning() << "\"" << fileName << "\"不存在";
-        return;
-    }
-
-    QFile file(fileName);
-
-    if (!file.open(QIODevice::ReadOnly)) {
-        qWarning() << "\"" << fileName << "\"权限不够";
-        return;
-    }
-}
-
+}  // namespace QJsonSchemaForm
 QT_END_NAMESPACE

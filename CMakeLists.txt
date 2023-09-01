@@ -29,12 +29,9 @@ message(STATUS "[${PROJECT_NAME}] 此CMakeLists.txt是否是顶层 ${PROJECT_IS_
 option(BUILD_EXAMPLES "是否编译例程" ${PROJECT_IS_TOP_LEVEL})
 option(BUILD_DEBUG_POSTFIX_D "是否需要添加后缀以区分是debug还是release" ${PROJECT_IS_TOP_LEVEL})
 
-set(CMAKE_CXX_STANDARD 17)
-
 # 如果此项目作为其他项目的第三方库，以下的配置不生效
 if(PROJECT_IS_TOP_LEVEL)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  set(CMAKE_INCLUDE_CURRENT_DIR ON)
+  set(CMAKE_CXX_STANDARD 20)
   set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
   set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 
@@ -58,10 +55,10 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets) # 识别是Qt6还是Qt5
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets)
 message(STATUS "[${PROJECT_NAME}] QT_VERSION: ${QT_VERSION}; QT_DIR: ${QT_DIR}")
 
-add_library(${PROJECT_NAME} SHARED)
+add_library(${PROJECT_NAME} OBJECT)
 
 add_subdirectory(src)
 
@@ -80,6 +77,7 @@ generate_export_header(
 
 target_link_libraries(
   ${PROJECT_NAME}
+  PRIVATE Qt${QT_VERSION_MAJOR}::Core
   PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
 )
 

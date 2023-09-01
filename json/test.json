@@ -1,0 +1,90 @@
+{
+  "type": "object",
+  "title": "Json Example",
+  "ui:order": ["str", "enum", "file", "dir", "num", "range", "arr", "obj"],
+  "properties": {
+    "invisible": {
+      "ui:visible": false,
+      "type": "string",
+      "default": "hello world"
+    },
+    "str": {
+      "type": "string",
+      "default": "hello world",
+      "description": "This is a tooltip"
+    },
+    "enum": {
+      "type": "string",
+      "default": "hello world",
+      "enum": ["first", "second", "third"]
+    },
+    "file": { "type": "string", "default": "/", "ui:widget": "file" },
+    "dir": { "type": "string", "default": "/", "ui:widget": "dir" },
+    "num": { "type": "number", "minimum": 0, "maximum": 50, "default": 10 },
+    "range": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 50,
+      "default": 10,
+      "ui:widget": "range"
+    },
+    "obj": {
+      "type": "object",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "First object",
+          "properties": {
+            "str": { "type": "string", "title": "String" },
+            "num": { "type": "number" }
+          }
+        },
+        {
+          "type": "object",
+          "title": "Second Object",
+          "properties": {
+            "str": { "type": "string", "default": "hello world" },
+            "enum": {
+              "type": "string",
+              "default": "hello world",
+              "enum": ["first", "second", "third"]
+            },
+            "file": { "type": "string", "default": "/", "ui:widget": "file" },
+            "dir": { "type": "string", "default": "/", "ui:widget": "dir" },
+            "num": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 50,
+              "default": 10
+            },
+            "range": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 50,
+              "default": 10,
+              "ui:widget": "range"
+            }
+          }
+        }
+      ],
+      "properties": {
+        "str": { "type": "string", "title": "String" },
+        "num": { "type": "number" }
+      }
+    },
+    "arr": {
+      "type": "array",
+      "items": [
+        { "type": "string", "title": "String" },
+        { "type": "number" },
+        { "type": "number", "minimum": 0, "maximum": 100 },
+        { "type": "number", "minimum": 0, "maximum": 100 },
+        { "type": "number", "minimum": 0, "maximum": 100, "ui:widget": "range" }
+      ],
+      "additionalItems": [
+        { "type": "string", "title": "String Object" },
+        { "type": "number", "title": "Number Object" }
+      ]
+    }
+  }
+}

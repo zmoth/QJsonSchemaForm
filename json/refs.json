@@ -1,0 +1,93 @@
+{
+  "type": "object",
+  "ui:width": 500,
+  "ui:height": 800,
+  "title": "Object types",
+
+  "$defs": {
+    "numbers": {
+      "type": "object",
+      "properties": {
+        "standard_float": {
+          "type": "number",
+          "description": "Standard floating point input"
+        },
+        "standard_integer": {
+          "type": "integer",
+          "description": "Standard integer input"
+        },
+        "integer_range": {
+          "type": "integer",
+          "ui:widget": "range",
+          "minimum": 10,
+          "maximum": 100,
+          "description": "Integer values clamped between 10 and 100"
+        },
+        "float_range": {
+          "type": "number",
+          "ui:widget": "range",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Float values clamped between 0 and 1"
+        }
+      }
+    },
+    "strings": {
+      "type": "object",
+      "properties": {
+        "standard_string": {
+          "type": "string",
+          "default": "default value",
+          "description": "Standard string input"
+        },
+        "string_choice": {
+          "type": "string",
+          "enum": [
+            "human",
+            "elf",
+            "dwarf",
+            "halfling",
+            "gnome",
+            "tiefling",
+            "dragonborn",
+            "tortle"
+          ],
+          "default": "dragonborn",
+          "description": "String choice with default value"
+        },
+        "string_color": {
+          "type": "string",
+          "ui:widget": "colour",
+          "default": "#FFAA00AA",
+          "description": "String color value"
+        },
+        "file_path": {
+          "type": "string",
+          "ui:widget": "file",
+          "description": "Choose a file"
+        },
+        "dir_path": {
+          "type": "string",
+          "ui:widget": "dir",
+          "description": "Choose a directory"
+        }
+      }
+    }
+  },
+
+  "properties": {
+    "invisible": {
+      "type": "string",
+      "default": "This field is not visible in the UI",
+      "ui:visible": false
+    },
+    "numbers": {
+      "$ref": "#/$defs/numbers",
+      "title": "Numbers"
+    },
+    "strings": {
+      "$ref": "#/$defs/strings",
+      "title": "Strings"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "type": "object",
+  "title": "Shapes",
+  "properties": {},
+  "additionalProperties": [
+    {
+      "type": "number",
+      "title": "Number",
+      "default": 33
+    },
+    {
+      "type": "object",
+      "title": "Circle",
+      "properties": {
+        "shape": { "type": "string", "default": "circle", "ui:visible": false },
+        "radius": { "type": "number" }
+      }
+    },
+    {
+      "type": "object",
+      "title": "Square",
+      "properties": {
+        "shape": { "type": "string", "default": "square", "ui:visible": false },
+        "length": { "type": "number" }
+      }
+    },
+    {
+      "type": "object",
+      "title": "Rectangle",
+      "properties": {
+        "shape": {
+          "type": "string",
+          "default": "rectangle",
+          "ui:visible": false
+        },
+        "width": { "type": "number" },
+        "height": { "type": "number" }
+      }
+    },
+    {
+      "type": "object",
+      "title": "Triangle",
+      "properties": {
+        "shape": {
+          "type": "string",
+          "default": "rectangle",
+          "ui:visible": false
+        },
+        "base": { "type": "number" },
+        "height": { "type": "number" }
+      }
+    }
+  ]
+}
