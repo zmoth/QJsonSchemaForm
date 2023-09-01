@@ -65,6 +65,7 @@ void QJsonSchemaObject::processSchema(const QJsonObject &schema)
     auto it = schema.find("oneOf");
     if (it != schema.end()) {
         auto *tabWidget = new QTabWidget(this);
+        connect(tabWidget, &QTabWidget::currentChanged, [this]() { Q_EMIT changed(); });
         tabWidget->setObjectName("tabs");
         formLayout()->addWidget(tabWidget);
 
@@ -78,7 +79,7 @@ void QJsonSchemaObject::processSchema(const QJsonObject &schema)
                 label = object.find("title")->toString();
             }
 
-            auto *newTab = QJsonSchemaWidgetsFactory::createWidget(object, tabWidget);
+            auto *newTab = QJsonSchemaWidgetsFactory::createWidget(object, this);
 
             if (newTab) {
                 tabWidget->addTab(newTab, label);
@@ -760,6 +761,7 @@ void QJsonSchemaNumber::processSchema(const QJsonObject &schema)
             auto *combo = new QComboBox(this);
             _widget = combo;
             combo->setObjectName("combo");
+            connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int) { Q_EMIT changed(); });
             layout()->addWidget(combo);
 
             for (auto en : e) {
