@@ -1,5 +1,7 @@
 #include "MainWindow.h"
 
+#include <QJsonSchemaForm/QJsonSchemaForm.h>
+
 #include <QBoxLayout>
 #include <QDockWidget>
 #include <QJsonDocument>
@@ -8,7 +10,6 @@
 #include <QTextEdit>
 
 #include "JsonHighlighter.h"
-#include "QJsonSchemaForm.h"
 
 const std::string jsonText = R"(
 {

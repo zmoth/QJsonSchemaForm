@@ -60,6 +60,15 @@ message(STATUS "[${PROJECT_NAME}] QT_VERSION: ${QT_VERSION}; QT_DIR: ${QT_DIR}")
 
 add_library(${PROJECT_NAME} OBJECT)
 
+# 添加公开的头文件
+file(GLOB_RECURSE INCS include/${PROJECT_NAME}/*.hpp include/${PROJECT_NAME}/*.h)
+
+target_sources(
+  ${PROJECT_NAME}
+  PRIVATE ${INCS}
+)
+
+# 添加源文件
 add_subdirectory(src)
 
 # 添加配置头文件，将CMake中的版本等信息转换为头文件
@@ -86,8 +95,9 @@ target_include_directories(
   ${PROJECT_NAME}
   PUBLIC $<INSTALL_INTERFACE:include>
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> # 对外开放的头文件
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${INSTALL_INCLUDEDIR}>
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src> # 私有的头文件
+  PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${INSTALL_INCLUDEDIR}>
+  PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src> # 私有的头文件
+  PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/QJsonSchemaForm>
 )
 
 # 宏定义

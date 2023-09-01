@@ -1,7 +1,5 @@
 #pragma once
 
-#include <qjsonobject.h>
-
 #include <QObject>
 
 #include "QJsonSchemaWidgets.h"

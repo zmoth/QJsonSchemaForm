@@ -1,7 +1,5 @@
 #pragma once
 
-#include <qtconfigmacros.h>
-
 #include <QJsonObject>
 
 #include "QJsonSchemaWidgets.h"
