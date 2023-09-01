@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <QBoxLayout>
+#include <QScrollArea>
 
 #include "QJsonSchemaWidgetsFactory.h"
 
@@ -12,7 +13,15 @@ QJsonSchemaForm::QJsonSchemaForm(QWidget *parent) : QJsonSchemaWidget(parent)
 {
     setObjectName("form");
 
+    _scrollArea = new QScrollArea(this);
+    _scrollArea->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+    _scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    _scrollArea->setWidgetResizable(true);
+
     auto *layout = new QVBoxLayout(this);
+    layout->addWidget(_scrollArea);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 }
 
 QJsonSchemaForm::QJsonSchemaForm(const QJsonObject &schema, QWidget *parent) : QJsonSchemaForm(parent)
@@ -23,7 +32,9 @@ QJsonSchemaForm::QJsonSchemaForm(const QJsonObject &schema, QWidget *parent) : Q
 void QJsonSchemaForm::processSchema(const QJsonObject &s)
 {
     _widget = QJsonSchemaWidgetsFactory::createWidget(s, this);
-    layout()->addWidget(_widget);
+    if (_widget) {
+        _scrollArea->setWidget(_widget);
+    }
 }
 
 QJsonValue QJsonSchemaForm::getValue() const

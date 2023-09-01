@@ -51,6 +51,8 @@ QJsonSchemaObject::QJsonSchemaObject(QWidget *parent) : QJsonSchemaWidget(parent
 {
     auto *layout = new QFormLayout(this);
     layout->setRowWrapPolicy(QFormLayout::WrapLongRows);
+    // layout->setContentsMargins(0, 0, 0, 0);
+    // layout->setSpacing(0);
 }
 
 QJsonSchemaObject::QJsonSchemaObject(const QJsonObject &schema, QWidget *parent) : QJsonSchemaObject(parent)
@@ -643,8 +645,10 @@ void QJsonSchemaString::setValue(const QString &v) const
 
 QJsonSchemaBoolean::QJsonSchemaBoolean(QWidget *parent) : QJsonSchemaWidget(parent)
 {
-    auto *h = new QHBoxLayout(this);
-    h->setAlignment(Qt::AlignRight);
+    auto *layout = new QHBoxLayout(this);
+    layout->setAlignment(Qt::AlignRight);
+    // layout->setContentsMargins(0, 0, 0, 0);
+    // layout->setSpacing(0);
 }
 
 QJsonSchemaBoolean::QJsonSchemaBoolean(const QJsonObject &schema, QWidget *parent) : QJsonSchemaBoolean(parent)
@@ -705,8 +709,10 @@ void QJsonSchemaBoolean::setValue(bool b)
 
 QJsonSchemaNumber::QJsonSchemaNumber(QWidget *parent) : QJsonSchemaWidget(parent)
 {
-    auto *h = new QHBoxLayout(this);
-    h->setAlignment(Qt::AlignRight);
+    auto *layout = new QHBoxLayout(this);
+    layout->setAlignment(Qt::AlignRight);
+    // layout->setContentsMargins(0, 0, 0, 0);
+    // layout->setSpacing(0);
 }
 
 QJsonSchemaNumber::QJsonSchemaNumber(const QJsonObject &schema, QWidget *parent) : QJsonSchemaNumber(parent)

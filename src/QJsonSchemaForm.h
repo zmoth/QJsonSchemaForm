@@ -7,6 +7,9 @@
 #include "QJsonSchemaWidgets.h"
 
 QT_BEGIN_NAMESPACE
+
+class QScrollArea;
+
 namespace QJsonSchemaForm {
 
 /// @brief schema 表单
@@ -31,6 +34,7 @@ class QJsonSchemaForm : public QJsonSchemaWidget
     void setValue(const QJsonObject &json) override;
 
   private:
+    QScrollArea *_scrollArea{nullptr};
     // Form表单肯定是由一个Object构成的
     QJsonSchemaWidget *_widget{nullptr};
 };
