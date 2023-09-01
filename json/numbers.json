@@ -19,9 +19,10 @@
       "type": "integer",
       "ui:widget": "range",
       "minimum": -10,
-      "maximum": 10,
-      "description": "Integer values clamped between 10 and 100",
-      "default": 45
+      "maximum": 100,
+      "description": "Integer values clamped between -10 and 100",
+      "default": 45,
+      "multipleOf": 15
     },
     "float_range": {
       "title": "Slider Float",
@@ -30,7 +31,8 @@
       "minimum": 0,
       "maximum": 1,
       "description": "Float values clamped between 0 and 1",
-      "default": 0.4
+      "default": 0.4,
+      "multipleOf": 0.1
     },
     "type": {
       "type": "number",

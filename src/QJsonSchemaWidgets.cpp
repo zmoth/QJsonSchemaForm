@@ -772,7 +772,8 @@ void QJsonSchemaNumber::processSchema(const QJsonObject &schema)
         }
     }
 
-    {  // 水平布局
+    {
+        // 水平布局
         auto *sliderBox = new QWidget(this);
         sliderBox->setObjectName("sliderBox");
         sliderBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -799,6 +800,7 @@ void QJsonSchemaNumber::processSchema(const QJsonObject &schema)
             double t =
                 static_cast<double>(i - slider->minimum()) / static_cast<double>(slider->maximum() - slider->minimum());
             double r = spinBox->minimum() * (1.0 - t) + spinBox->maximum() * t;
+
             spinBox->setValue(r);
         });
 
@@ -828,7 +830,19 @@ void QJsonSchemaNumber::processSchema(const QJsonObject &schema)
 
         if (schema.find("type")->toString() == "integer") {
             spinBox->setDecimals(0);
+            spinBox->setSingleStep(1);
         }
+
+        auto it = schema.find("multipleOf");
+        if (it != schema.end()) {
+            double step = it->toDouble();
+            spinBox->setSingleStep(step);
+        }
+
+        // double sliderStep =
+        //     (slider->maximum() - slider->minimum()) * spinBox->singleStep() / (spinBox->maximum() -
+        //     spinBox->minimum());
+        // slider->setSingleStep(static_cast<int>(sliderStep));
     }
 }
 
