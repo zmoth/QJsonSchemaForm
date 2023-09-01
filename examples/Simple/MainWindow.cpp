@@ -12,94 +12,91 @@
 const std::string jsonText = R"(
 {
   "type": "object",
-  "ui:width": 500,
-  "ui:height": 800,
-  "title": "Object types",
-
-  "$defs": {
-    "numbers": {
-      "type": "object",
-      "properties": {
-        "standard_float": {
-          "type": "number",
-          "description": "Standard floating point input"
-        },
-        "standard_integer": {
-          "type": "integer",
-          "description": "Standard integer input"
-        },
-        "integer_range": {
-          "type": "integer",
-          "ui:widget": "range",
-          "minimum": 10,
-          "maximum": 100,
-          "description": "Integer values clamped between 10 and 100"
-        },
-        "float_range": {
-          "type": "number",
-          "ui:widget": "range",
-          "minimum": 0,
-          "maximum": 1,
-          "description": "Float values clamped between 0 and 1"
-        }
-      }
-    },
-    "strings": {
-      "type": "object",
-      "properties": {
-        "standard_string": {
-          "type": "string",
-          "default": "default value",
-          "description": "Standard string input"
-        },
-        "string_choice": {
-          "type": "string",
-          "enum": [
-            "human",
-            "elf",
-            "dwarf",
-            "halfling",
-            "gnome",
-            "tiefling",
-            "dragonborn",
-            "tortle"
-          ],
-          "default": "dragonborn",
-          "description": "String choice with default value"
-        },
-        "string_color": {
-          "type": "string",
-          "ui:widget": "colour",
-          "default": "#FFAA00AA",
-          "description": "String color value"
-        },
-        "file_path": {
-          "type": "string",
-          "ui:widget": "file",
-          "description": "Choose a file"
-        },
-        "dir_path": {
-          "type": "string",
-          "ui:widget": "dir",
-          "description": "Choose a directory"
-        }
-      }
-    }
-  },
-
+  "title": "Json Example",
+  "ui:order": ["str", "enum", "file", "dir", "num", "range", "arr", "obj"],
   "properties": {
     "invisible": {
+      "ui:visible": false,
       "type": "string",
-      "default": "This field is not visible in the UI",
-      "ui:visible": false
+      "default": "hello world"
     },
-    "numbers": {
-      "$ref": "#/$defs/numbers",
-      "title": "Numbers"
+    "str": {
+      "type": "string",
+      "default": "hello world",
+      "description": "This is a tooltip"
     },
-    "strings": {
-      "$ref": "#/$defs/strings",
-      "title": "Strings"
+    "enum": {
+      "type": "string",
+      "default": "hello world",
+      "enum": ["first", "second", "third"]
+    },
+    "file": { "type": "string", "default": "/", "ui:widget": "file" },
+    "dir": { "type": "string", "default": "/", "ui:widget": "dir" },
+    "num": { "type": "number", "minimum": 0, "maximum": 50, "default": 10 },
+    "range": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 50,
+      "default": 10,
+      "ui:widget": "range"
+    },
+    "obj": {
+      "type": "object",
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "First object",
+          "properties": {
+            "str": { "type": "string", "title": "String" },
+            "num": { "type": "number" }
+          }
+        },
+        {
+          "type": "object",
+          "title": "Second Object",
+          "properties": {
+            "str": { "type": "string", "default": "hello world" },
+            "enum": {
+              "type": "string",
+              "default": "hello world",
+              "enum": ["first", "second", "third"]
+            },
+            "file": { "type": "string", "default": "/", "ui:widget": "file" },
+            "dir": { "type": "string", "default": "/", "ui:widget": "dir" },
+            "num": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 50,
+              "default": 10
+            },
+            "range": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 50,
+              "default": 10,
+              "ui:widget": "range"
+            }
+          }
+        }
+      ],
+      "properties": {
+        "str": { "type": "string", "title": "String" },
+        "num": { "type": "number" }
+      }
+    },
+    "arr": {
+      "type": "array",
+      "items": [
+        { "type": "string", "title": "String" },
+        { "type": "number" },
+        { "type": "number", "minimum": 0, "maximum": 100 },
+        { "type": "number", "minimum": 0, "maximum": 100 },
+        { "type": "number", "minimum": 0, "maximum": 100, "ui:widget": "range" }
+      ],
+      "additionalItems": [
+        { "type": "string", "title": "String Object" },
+        { "type": "number", "title": "Number Object" }
+      ]
     }
   }
 }

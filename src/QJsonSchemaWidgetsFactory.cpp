@@ -27,7 +27,7 @@ static QJsonObject getRef(const QJsonObject &json, const QString &ref)
     return {};
 }
 
-static QJsonObject getParentSchema(QJsonSchemaWidget *widget)
+static QJsonObject getParentSchema(QWidget *widget)
 {
     auto *w = dynamic_cast<QJsonSchemaWidget *>(widget->parentWidget());
     if (!w) {
@@ -43,7 +43,7 @@ static QJsonObject getParentSchema(QJsonSchemaWidget *widget)
 
 QJsonSchemaWidgetsFactory::QJsonSchemaWidgetsFactory(QObject *parent) : QObject(parent) {}
 
-QJsonSchemaWidget *QJsonSchemaWidgetsFactory::createWidget(const QJsonObject &schema, QJsonSchemaWidget *parent)
+QJsonSchemaWidget *QJsonSchemaWidgetsFactory::createWidget(const QJsonObject &schema, QWidget *parent)
 {
     auto s = dereference(schema, parent);
 
@@ -114,7 +114,7 @@ QJsonObject QJsonSchemaWidgetsFactory::getDef(const QJsonObject &schema, const Q
     return {};
 }
 
-QJsonObject QJsonSchemaWidgetsFactory::dereference(const QJsonObject &schema, QJsonSchemaWidget *widget)
+QJsonObject QJsonSchemaWidgetsFactory::dereference(const QJsonObject &schema, QWidget *widget)
 {
     if (schema.contains("$ref")) {
         QJsonObject j;

@@ -47,35 +47,59 @@ void QJsonSchemaWidget::setSchema(const QJsonObject &schema)
 
 #pragma region /*QJsonSchemaObject*/
 
-QJsonSchemaObject::QJsonSchemaObject(QJsonSchemaWidget *parent) : QJsonSchemaWidget(parent)
+QJsonSchemaObject::QJsonSchemaObject(QWidget *parent) : QJsonSchemaWidget(parent)
 {
     auto *layout = new QFormLayout(this);
     layout->setRowWrapPolicy(QFormLayout::WrapLongRows);
 }
 
-QJsonSchemaObject::QJsonSchemaObject(const QJsonObject &schema, QJsonSchemaWidget *parent) : QJsonSchemaObject(parent)
+QJsonSchemaObject::QJsonSchemaObject(const QJsonObject &schema, QWidget *parent) : QJsonSchemaObject(parent)
 {
     setSchema(schema);
 }
 
 void QJsonSchemaObject::processSchema(const QJsonObject &schema)
 {
-    auto *l = formLayout();
+    // 如果存在oneOf
 
-    // if (tabwidget) {
-    //     tabwidget->deleteLater();
-    //     tabwidget = nullptr;
-    // }
+    auto it = schema.find("oneOf");
+    if (it != schema.end()) {
+        auto *tabWidget = new QTabWidget(this);
+        tabWidget->setObjectName("tabs");
+        formLayout()->addWidget(tabWidget);
 
-    while (l->rowCount()) {
-        l->removeRow(l->rowCount() - 1);
+        auto array = it->toArray();
+        int i = 0;
+        for (auto v : array) {
+            auto object = v.toObject();
+
+            QString label{QString::number(i)};
+            if (object.contains("title")) {
+                label = object.find("title")->toString();
+            }
+
+            auto *newTab = QJsonSchemaWidgetsFactory::createWidget(object, tabWidget);
+
+            if (newTab) {
+                tabWidget->addTab(newTab, label);
+            }
+            i++;
+        }
+
+        return;
     }
-    widgetsMap.clear();
+
+    setOneOf(schema);
+}
+
+void QJsonSchemaObject::setOneOf(const QJsonObject &schema)
+{
+    auto *layout = formLayout();
 
     // 间距
     if (schema.contains("ui:spacing")) {
         auto spacing = schema.find("ui:spacing")->toInt();
-        l->setVerticalSpacing(spacing);
+        layout->setVerticalSpacing(spacing);
     }
 
     if (schema.contains("properties")) {
@@ -96,6 +120,7 @@ void QJsonSchemaObject::processSchema(const QJsonObject &schema)
 
             // 控件
             auto *widget = QJsonSchemaWidgetsFactory::createWidget(prop, this);
+            widget->setWindowTitle(key);
             widget->setObjectName(key);
 
             // 是否显示
@@ -121,14 +146,10 @@ void QJsonSchemaObject::processSchema(const QJsonObject &schema)
         }
     }
 
-    // ui格式
-    QString uiWidget = "rows";
-    if (schema.contains("ui:widget")) {
-        uiWidget = schema.find("ui:widget")->toString();
-    }
-    // if (uiWidget == "tabs") {
-    //     tabwidget = new QTabWidget(this);
-    //     l->addRow(tabwidget);
+    // // ui格式
+    // QString uiWidget = "rows";
+    // if (schema.contains("ui:widget")) {
+    //     uiWidget = schema.find("ui:widget")->toString();
     // }
 
     // 顺序
@@ -136,30 +157,31 @@ void QJsonSchemaObject::processSchema(const QJsonObject &schema)
         auto order = schema.find("ui:order")->toArray();
         for (auto valueRef : order) {
             QString name = valueRef.toString();
-
             if (widgetsMap.contains(name)) {
-                if (uiWidget == "tabs") {
-                    // tabwidget->addTab(props.at(x.toString()).second, props.at(x.toString()).first);
-                } else {
-                    l->addRow(widgetsMap[name].first, widgetsMap[name].second);
-                }
+                layout->addRow(widgetsMap[name].first, widgetsMap[name].second);
             }
-            // widgetsMap.erase(name.toString());
         }
     } else {
         for (auto &widget : widgetsMap) {
-            if (uiWidget == "tabs") {
-                // tabwidget->addTab(x.second.second, x.second.first);
-            } else {
-                l->addRow(widget.second.first, widget.second.second);
-            }
+            layout->addRow(widget.second.first, widget.second.second);
         }
     }
 }
 
 QJsonValue QJsonSchemaObject::getValue() const
 {
+    auto schema = getSchema();
+    auto it = schema.find("oneOf");
+    if (it != schema.end()) {
+        auto *tabs = findChild<QTabWidget *>("tabs", Qt::FindDirectChildrenOnly);
+
+        if (auto *currentTab = dynamic_cast<QJsonSchemaWidget *>(tabs->currentWidget())) {
+            return currentTab->getValue().toObject();
+        }
+    }
+
     QJsonObject json;
+
     for (const auto &widget : widgetsMap) {
         json[widget.first] = widget.second.second->getValue();
     }
@@ -168,10 +190,19 @@ QJsonValue QJsonSchemaObject::getValue() const
 
 void QJsonSchemaObject::setValue(const QJsonObject &json)
 {
+    auto schema = getSchema();
+    auto it = schema.find("oneOf");
+    if (it != schema.end()) {
+        auto *tabs = findChild<QTabWidget *>("tabs", Qt::FindDirectChildrenOnly);
+
+        if (auto *currentTab = dynamic_cast<QJsonSchemaWidget *>(tabs->currentWidget())) {
+            QJsonSchemaWidgetsFactory::setValue(currentTab, json);
+        }
+        return;
+    }
+
     for (const auto &key : json.keys()) {
         if (widgetsMap.contains(key)) {
-            // widgets.at(key).second->setValue(json[key]);
-
             QJsonSchemaWidgetsFactory::setValue(widgetsMap[key].second, json[key]);
         }
     }
@@ -191,7 +222,7 @@ void QJsonSchemaObject::setFormLayout(QFormLayout *layout)
 
 #pragma region /*QJsonSchemaArray*/
 
-QJsonSchemaArray::QJsonSchemaArray(QJsonSchemaWidget *parent) : QJsonSchemaWidget(parent)
+QJsonSchemaArray::QJsonSchemaArray(QWidget *parent) : QJsonSchemaWidget(parent)
 {
     {
         auto *l = new QFormLayout(this);
@@ -216,8 +247,6 @@ QJsonSchemaArray::QJsonSchemaArray(QJsonSchemaWidget *parent) : QJsonSchemaWidge
         h->addWidget(oneOf);
         h->addWidget(add);
 
-        // _propertiesLayout->setMargin(3);
-
         l->addRow(propertiesLayout);
         l->addRow(h);
 
@@ -230,7 +259,7 @@ QJsonSchemaArray::QJsonSchemaArray(QJsonSchemaWidget *parent) : QJsonSchemaWidge
     }
 }
 
-QJsonSchemaArray::QJsonSchemaArray(const QJsonObject &schema, QJsonSchemaWidget *parent) : QJsonSchemaArray(parent)
+QJsonSchemaArray::QJsonSchemaArray(const QJsonObject &schema, QWidget *parent) : QJsonSchemaArray(parent)
 {
     setSchema(schema);
 }
@@ -240,7 +269,6 @@ void QJsonSchemaArray::pushBack(const QJsonObject &o)
     auto *w = QJsonSchemaWidgetsFactory::createWidget(o, this);
     auto *h = new QHBoxLayout();
 
-    w->setSchema(o);
     h->addWidget(w);
 
     auto *up = new QToolButton(this);
@@ -428,8 +456,6 @@ void QJsonSchemaArray::setValue(QJsonArray data)
 {
     auto mm = std::min(static_cast<size_t>(data.size()), items.size());
     for (int i = 0; i < mm; i++) {
-        // items[i].widget->setValue(data[i]);
-
         QJsonSchemaWidgetsFactory::setValue(items[i].widget, data[i]);
     }
 }
@@ -438,7 +464,7 @@ void QJsonSchemaArray::setValue(QJsonArray data)
 
 #pragma region /*QJsonSchemaString*/
 
-QJsonSchemaString::QJsonSchemaString(QJsonSchemaWidget *parent) : QJsonSchemaWidget(parent)
+QJsonSchemaString::QJsonSchemaString(QWidget *parent) : QJsonSchemaWidget(parent)
 {
     auto *h = new QHBoxLayout(this);
 
@@ -498,7 +524,7 @@ QJsonSchemaString::QJsonSchemaString(QJsonSchemaWidget *parent) : QJsonSchemaWid
             [this](int) { widget->setText(combo->currentText()); });
 }
 
-QJsonSchemaString::QJsonSchemaString(const QJsonObject &schema, QJsonSchemaWidget *parent) : QJsonSchemaString(parent)
+QJsonSchemaString::QJsonSchemaString(const QJsonObject &schema, QWidget *parent) : QJsonSchemaString(parent)
 {
     setSchema(schema);
 }
@@ -614,14 +640,13 @@ void QJsonSchemaString::setValue(const QString &v) const
 
 #pragma region /*QJsonSchemaBoolean*/
 
-QJsonSchemaBoolean::QJsonSchemaBoolean(QJsonSchemaWidget *parent) : QJsonSchemaWidget(parent)
+QJsonSchemaBoolean::QJsonSchemaBoolean(QWidget *parent) : QJsonSchemaWidget(parent)
 {
     auto *h = new QHBoxLayout(this);
     h->setAlignment(Qt::AlignRight);
 }
 
-QJsonSchemaBoolean::QJsonSchemaBoolean(const QJsonObject &schema, QJsonSchemaWidget *parent)
-    : QJsonSchemaBoolean(parent)
+QJsonSchemaBoolean::QJsonSchemaBoolean(const QJsonObject &schema, QWidget *parent) : QJsonSchemaBoolean(parent)
 {
     setSchema(schema);
 }
@@ -677,13 +702,13 @@ void QJsonSchemaBoolean::setValue(bool b)
 
 #pragma region /*QJsonSchemaNumber*/
 
-QJsonSchemaNumber::QJsonSchemaNumber(QJsonSchemaWidget *parent) : QJsonSchemaWidget(parent)
+QJsonSchemaNumber::QJsonSchemaNumber(QWidget *parent) : QJsonSchemaWidget(parent)
 {
     auto *h = new QHBoxLayout(this);
     h->setAlignment(Qt::AlignRight);
 }
 
-QJsonSchemaNumber::QJsonSchemaNumber(const QJsonObject &schema, QJsonSchemaWidget *parent) : QJsonSchemaNumber(parent)
+QJsonSchemaNumber::QJsonSchemaNumber(const QJsonObject &schema, QWidget *parent) : QJsonSchemaNumber(parent)
 {
     setSchema(schema);
 }

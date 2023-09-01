@@ -17,13 +17,13 @@ class QJsonSchemaWidgetsFactory : public QObject
     explicit QJsonSchemaWidgetsFactory(QObject *parent = nullptr);
     ~QJsonSchemaWidgetsFactory() override = default;
 
-    static QJsonSchemaWidget *createWidget(const QJsonObject &schema, QJsonSchemaWidget *parent = nullptr);
+    static QJsonSchemaWidget *createWidget(const QJsonObject &schema, QWidget *parent = nullptr);
 
     static void setValue(QJsonSchemaWidget *widget, const QJsonValue &value);
 
     [[nodiscard]] static QJsonObject getDef(const QJsonObject &schema, const QString &ref);
 
-    [[nodiscard]] static QJsonObject dereference(const QJsonObject &schema, QJsonSchemaWidget *widget);
+    [[nodiscard]] static QJsonObject dereference(const QJsonObject &schema, QWidget *widget);
 };
 
 }  // namespace QJsonSchemaForm
