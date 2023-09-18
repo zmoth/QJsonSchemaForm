@@ -8,11 +8,7 @@
 QT_BEGIN_NAMESPACE
 
 class QComboBox;
-class QLineEdit;
-class QPushButton;
-class QCheckBox;
 class QAbstractButton;
-class QDateEdit;
 class QFormLayout;
 class QToolButton;
 class QListWidget;
@@ -129,12 +125,8 @@ class QJsonSchemaString : public QJsonSchemaWidget
     [[nodiscard]] QJsonValue getValue() const override;
     void setValue(const QString &) const;
 
-    QComboBox *combo = nullptr;
-    QLineEdit *widget = nullptr;
-    QPushButton *fileButton = nullptr;
-    QPushButton *dirButton = nullptr;
-    QPushButton *colorButton = nullptr;
-    QDateEdit *dateEdit = nullptr;
+  private:
+    QWidget *_widget{nullptr};
 };
 
 /// @brief 布尔

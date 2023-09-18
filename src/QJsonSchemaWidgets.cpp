@@ -1,11 +1,17 @@
 #include "QJsonSchemaWidgets.h"
 
-#include <QCheckBox>
-#include <QColorDialog>
-#include <QComboBox>
-#include <QDateEdit>
+#include <qcheckbox.h>
+#include <qcolordialog.h>
+#include <qcombobox.h>
+#include <qdatetimeedit.h>
+#include <qfiledialog.h>
+#include <qlineedit.h>
+#include <qpushbutton.h>
+#include <qtextedit.h>
+#include <qtoolbutton.h>
+#include <qwidget.h>
+
 #include <QDoubleSpinBox>
-#include <QFileDialog>
 #include <QFormLayout>
 #include <QHBoxLayout>
 #include <QJsonArray>
@@ -13,15 +19,10 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QLine>
-#include <QLineEdit>
 #include <QListWidget>
-#include <QPushButton>
 #include <QScrollArea>
 #include <QSlider>
 #include <QTabWidget>
-#include <QTextEdit>
-#include <QToolButton>
-#include <QWidget>
 
 #include "QJsonSchemaWidgetsFactory.h"
 #include "ToggleSwitch.h"
@@ -469,62 +470,7 @@ void QJsonSchemaArray::setValue(QJsonArray data)
 
 QJsonSchemaString::QJsonSchemaString(QWidget *parent) : QJsonSchemaWidget(parent)
 {
-    auto *h = new QHBoxLayout(this);
-
-    widget = new QLineEdit(this);
-    combo = new QComboBox(this);
-    fileButton = new QPushButton(this);
-    dirButton = new QPushButton(this);
-    colorButton = new QPushButton(this);
-    dateEdit = new QDateEdit(this);
-
-    h->addWidget(widget, 0);
-    h->addWidget(fileButton, 0);
-    h->addWidget(dirButton, 0);
-    h->addWidget(colorButton, 0);
-    h->addWidget(combo, 0);
-    h->addWidget(dateEdit, 0);
-
-    connect(widget, &QLineEdit::textChanged, [this]() { Q_EMIT changed(); });
-
-    connect(dateEdit, &QDateEdit::dateChanged, [this](const QDate &date) {
-        // auto fileName = QFileDialog::getOpenFileName(this, tr("Choose File"),
-        // "/home/jana", tr("Image Files (*.png *.jpg *.bmp)"));
-        widget->setText(date.toString(Qt::ISODate));
-        // _fileButton->setText(fileName);
-    });
-
-    connect(fileButton, &QPushButton::clicked, [this](bool) {
-        // auto fileName = QFileDialog::getOpenFileName(this, tr("Choose File"),
-        // "/home/jana", tr("Image Files (*.png *.jpg *.bmp)"));
-        auto fileName = QFileDialog::getOpenFileName(this);
-        widget->setText(fileName);
-        // _fileButton->setText(fileName);
-    });
-
-    connect(dirButton, &QPushButton::clicked, [this](bool) {
-        // auto fileName = QFileDialog::getOpenFileName(this, tr("Choose File"),
-        // "/home/jana", tr("Image Files (*.png *.jpg *.bmp)"));
-        auto fileName = QFileDialog::getExistingDirectory(this);
-        widget->setText(fileName);
-        // _fileButton->setText(fileName);
-    });
-
-    connect(colorButton, &QPushButton::clicked, [this](bool) {
-        // auto fileName = QFileDialog::getOpenFileName(this, tr("Choose File"),
-        // "/home/jana", tr("Image Files (*.png *.jpg *.bmp)"));
-        // auto fileName = QFileDialog::getExistingDirectory(this);
-        auto c = QColorDialog::getColor(Qt::white, this, "Choose a Color",
-                                        QColorDialog::DontUseNativeDialog | QColorDialog::ShowAlphaChannel);
-        int r, g, b, a;
-        c.getRgb(&r, &g, &b, &a);
-        char txt[25];
-        int cx = std::snprintf(txt, 25, "#%02x%02x%02x%02x", r, g, b, a);
-        widget->setText(txt);
-    });
-
-    connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            [this](int) { widget->setText(combo->currentText()); });
+    auto *layout = new QHBoxLayout(this);
 }
 
 QJsonSchemaString::QJsonSchemaString(const QJsonObject &schema, QWidget *parent) : QJsonSchemaString(parent)
@@ -534,77 +480,114 @@ QJsonSchemaString::QJsonSchemaString(const QJsonObject &schema, QWidget *parent)
 
 void QJsonSchemaString::processSchema(const QJsonObject &schema)
 {
-    QString wid = "";
-
-    QString defaultValue;
+    // 默认值
+    QString defaultValue{};
     {
-        auto mI = schema.find("default");
-        if (mI != schema.end()) {
-            defaultValue = mI->toString();
+        auto iter = schema.find("default");
+        if (iter != schema.end()) {
+            defaultValue = iter->toString();
         }
     }
 
+    // ui种类
+    QString uiWidget{};
     {
-        auto mI = schema.find("ui:widget");
-        if (mI != schema.end()) {
-            wid = mI->toString();
+        auto iter = schema.find("ui:widget");
+        if (iter != schema.end()) {
+            uiWidget = iter->toString();
         }
     }
 
+    // 单选
     {
-        auto mI = schema.find("enum");
-        if (mI != schema.end()) {
-            auto e = mI->toArray();
+        auto iter = schema.find("enum");
+        if (iter != schema.end()) {
+            auto array = iter->toArray();
 
-            for (auto en : e) {
-                if (en.isString()) {
-                    combo->addItem(en.toString());
+            auto *combo = new QComboBox(this);
+            connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int) { Q_EMIT changed(); });
+            _widget = combo;
+            layout()->addWidget(_widget);
+
+            for (auto value : array) {
+                if (value.isString()) {
+                    combo->addItem(value.toString());
                 }
             }
 
-            fileButton->setVisible(false);
-            dirButton->setVisible(false);
-            widget->setVisible(false);
-            colorButton->setVisible(false);
-            dateEdit->setVisible(false);
-            combo->setVisible(true);
             setValue(defaultValue);
+
             return;
         }
     }
 
-    // widget->setText(defaultValue);
-    if (wid == "file") {
-        fileButton->setVisible(true);
-        dirButton->setVisible(false);
-        combo->setVisible(false);
-        colorButton->setVisible(false);
-        dateEdit->setVisible(false);
-    } else if (wid == "date") {
-        dirButton->setVisible(false);
-        fileButton->setVisible(false);
-        combo->setVisible(false);
-        colorButton->setVisible(false);
-        widget->setVisible(false);
-        dateEdit->setVisible(true);
-    } else if (wid == "dir") {
-        fileButton->setVisible(false);
-        dirButton->setVisible(true);
-        combo->setVisible(false);
-        colorButton->setVisible(false);
-        dateEdit->setVisible(false);
-    } else if (wid == "color" || wid == "colour") {
-        dirButton->setVisible(false);
-        fileButton->setVisible(false);
-        combo->setVisible(false);
-        colorButton->setVisible(true);
-        dateEdit->setVisible(false);
-    } else {
-        dirButton->setVisible(false);
-        fileButton->setVisible(false);
-        combo->setVisible(false);
-        colorButton->setVisible(false);
-        dateEdit->setVisible(false);
+    // 多行文本
+    if (uiWidget == "text") {
+        auto *textEdit = new QTextEdit(this);
+        connect(textEdit, &QTextEdit::textChanged, [this]() { Q_EMIT changed(); });
+        _widget = textEdit;
+        layout()->addWidget(_widget);
+
+        setValue(defaultValue);
+
+        return;
+    }
+
+    // 时间
+    if (uiWidget == "date") {
+        auto *dateEdit = new QDateEdit(this);
+        connect(dateEdit, &QDateEdit::dateChanged, [this]() { Q_EMIT changed(); });
+        _widget = dateEdit;
+        layout()->addWidget(_widget);
+
+        setValue(defaultValue);
+
+        return;
+    }
+
+    // 单行文本
+    auto *lineEdit = new QLineEdit(this);
+    connect(lineEdit, &QLineEdit::textChanged, [this]() { Q_EMIT changed(); });
+    _widget = lineEdit;
+    layout()->addWidget(_widget);
+
+    if (uiWidget == "file") {
+        auto *fileButton = new QPushButton(this);
+        connect(fileButton, &QPushButton::clicked, [this, lineEdit](bool) {
+            // auto fileName = QFileDialog::getOpenFileName(this, tr("Choose File"),
+            // "/home/jana", tr("Image Files (*.png *.jpg *.bmp)"));
+            auto fileName = QFileDialog::getOpenFileName(this);
+            lineEdit->setText(fileName);
+            // _fileButton->setText(fileName);
+        });
+        layout()->addWidget(fileButton);
+
+    } else if (uiWidget == "dir") {
+        auto *dirButton = new QPushButton(this);
+        connect(dirButton, &QPushButton::clicked, [this, lineEdit](bool) {
+            // auto fileName = QFileDialog::getOpenFileName(this, tr("Choose File"),
+            // "/home/jana", tr("Image Files (*.png *.jpg *.bmp)"));
+            auto fileName = QFileDialog::getExistingDirectory(this);
+            lineEdit->setText(fileName);
+            // _fileButton->setText(fileName);
+        });
+        layout()->addWidget(dirButton);
+
+    } else if (uiWidget == "color" || uiWidget == "colour") {
+        auto *colorButton = new QPushButton(this);
+        connect(colorButton, &QPushButton::clicked, [this, lineEdit](bool) {
+            // auto fileName = QFileDialog::getOpenFileName(this, tr("Choose File"),
+            // "/home/jana", tr("Image Files (*.png *.jpg *.bmp)"));
+            // auto fileName = QFileDialog::getExistingDirectory(this);
+            auto c = QColorDialog::getColor(Qt::white, this, "Choose a Color",
+                                            QColorDialog::DontUseNativeDialog | QColorDialog::ShowAlphaChannel);
+            int r, g, b, a;
+            c.getRgb(&r, &g, &b, &a);
+            char txt[25];
+            int cx = std::snprintf(txt, 25, "#%02x%02x%02x%02x", r, g, b, a);
+            lineEdit->setText(txt);
+        });
+        layout()->addWidget(colorButton);
     }
 
     setValue(defaultValue);
@@ -612,30 +595,33 @@ void QJsonSchemaString::processSchema(const QJsonObject &schema)
 
 QJsonValue QJsonSchemaString::getValue() const
 {
-    if (auto *w = dynamic_cast<QLineEdit *>(widget)) {
+    if (auto *w = dynamic_cast<QLineEdit *>(_widget)) {
         return w->text();
+    }
+    if (auto *w = dynamic_cast<QTextEdit *>(_widget)) {
+        return w->toPlainText();
+    }
+    if (auto *w = dynamic_cast<QComboBox *>(_widget)) {
+        return w->currentText();
+    }
+    if (auto *w = dynamic_cast<QDateEdit *>(_widget)) {
+        return w->date().toString(Qt::ISODate);
     }
     return {};
 }
 
 void QJsonSchemaString::setValue(const QString &v) const
 {
-    if (combo) {
-        for (int i = 0; i < combo->count(); i++) {
-            if (combo->itemText(i) == v) {
-                combo->setCurrentIndex(i);
-                break;
-            }
-        }
-    }
-    if (dateEdit->isVisible()) {
+    if (auto *w = dynamic_cast<QLineEdit *>(_widget)) {
+        w->setText(v);
+    } else if (auto *w = dynamic_cast<QTextEdit *>(_widget)) {
+        w->setText(v);
+    } else if (auto *w = dynamic_cast<QComboBox *>(_widget)) {
+        w->setCurrentText(v);
+    } else if (auto *w = dynamic_cast<QDateEdit *>(_widget)) {
         QDate d;
         d = QDate::fromString(v, Qt::ISODate);
-        dateEdit->setDate(d);
-    } else {
-        if (widget) {
-            widget->setText(v);
-        }
+        w->setDate(d);
     }
 }
 

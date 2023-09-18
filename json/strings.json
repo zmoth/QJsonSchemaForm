@@ -24,6 +24,12 @@
       "default": "dragonborn",
       "description": "String choice with default value"
     },
+    "text": {
+      "type": "string",
+      "ui:widget": "text",
+      "default": "{\n文本\n}",
+      "description": "文本编辑器"
+    },
     "string_color": {
       "title": "Color",
       "type": "string",

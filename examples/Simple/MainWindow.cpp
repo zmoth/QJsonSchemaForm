@@ -15,7 +15,17 @@ const std::string jsonText = R"(
 {
   "type": "object",
   "title": "Json Example",
-  "ui:order": ["str", "enum", "file", "dir", "num", "range", "arr", "obj"],
+  "ui:order": [
+    "str",
+    "text",
+    "enum",
+    "file",
+    "dir",
+    "num",
+    "range",
+    "arr",
+    "obj"
+  ],
   "properties": {
     "invisible": {
       "ui:visible": false,
@@ -24,6 +34,12 @@ const std::string jsonText = R"(
     },
     "str": {
       "type": "string",
+      "default": "hello world",
+      "description": "This is a tooltip"
+    },
+    "text": {
+      "type": "string",
+      "ui:widget": "text",
       "default": "hello world",
       "description": "This is a tooltip"
     },
