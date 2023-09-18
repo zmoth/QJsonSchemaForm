@@ -524,6 +524,10 @@ void QJsonSchemaString::processSchema(const QJsonObject &schema)
     // 多行文本
     if (uiWidget == "text") {
         auto *textEdit = new QTextEdit(this);
+
+        QFontMetrics metrics(textEdit->font());
+        textEdit->setTabStopDistance(4 * metrics.averageCharWidth());
+
         connect(textEdit, &QTextEdit::textChanged, [this]() { Q_EMIT changed(); });
         _widget = textEdit;
         layout()->addWidget(_widget);
