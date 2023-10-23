@@ -1,11 +1,18 @@
-cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.15)
 
-# 添加版本号
+# 添加版本号信息
 set(PROJECT_VERSION_MAJOR 0) # 主版本号
 set(PROJECT_VERSION_MINOR 1) # 子版本号
-set(PROJECT_VERSION_PATCH 0) # 阶段版本号
-set(PROJECT_VERSION_TWEAK 0) # build
-set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}.${PROJECT_VERSION_TWEAK})
+set(PROJECT_VERSION_PATCH 0) # 补丁版本号
+set(PROJECT_VERSION_TWEAK 0) # 修订号，预发布版本
+
+# 设置版本号
+if(${PROJECT_VERSION_TWEAK} EQUAL 0)
+  set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
+else()
+  set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}.${PROJECT_VERSION_TWEAK})
+endif()
+
 set(PROJECT_DESCRIPTION "Qt Json Schema Form.")
 set(PROJECT_HOMEPAGE_URL "https://zmoth.top")
 
@@ -18,12 +25,7 @@ project(
   LANGUAGES CXX
 )
 
-message(STATUS "[${PROJECT_NAME}] Project ${PROJECT_NAME} v${PROJECT_VERSION}")
-
-message(STATUS "[${PROJECT_NAME}] C++ compiler ID is: ${CMAKE_CXX_COMPILER_ID}")
-message(STATUS "[${PROJECT_NAME}] cmake system is: ${CMAKE_SYSTEM_NAME}")
-message(STATUS "[${PROJECT_NAME}] install默认安装位置: ${CMAKE_INSTALL_PREFIX}")
-message(STATUS "[${PROJECT_NAME}] 此CMakeLists.txt是否是顶层 ${PROJECT_IS_TOP_LEVEL}")
+set(CMAKE_CXX_STANDARD 11)
 
 # 选项
 option(BUILD_EXAMPLES "是否编译例程" ${PROJECT_IS_TOP_LEVEL})
@@ -31,10 +33,6 @@ option(BUILD_DEBUG_POSTFIX_D "是否需要添加后缀以区分是debug还是rel
 
 # 如果此项目作为其他项目的第三方库，以下的配置不生效
 if(PROJECT_IS_TOP_LEVEL)
-  set(CMAKE_CXX_STANDARD 20)
-  set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
-  set(CMAKE_DISABLE_SOURCE_CHANGES ON)
-
   # 设置输出路径
   include(GNUInstallDirs)
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}) # 静态库的文件夹位置
@@ -50,6 +48,12 @@ if(PROJECT_IS_TOP_LEVEL)
     set(CMAKE_MINSIZEREL_POSTFIX "s")
   endif()
 endif()
+
+message(STATUS "[${PROJECT_NAME}] Project ${PROJECT_NAME} v${PROJECT_VERSION}")
+message(STATUS "[${PROJECT_NAME}] C++ compiler ID is: ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "[${PROJECT_NAME}] cmake system is: ${CMAKE_SYSTEM_NAME}")
+message(STATUS "[${PROJECT_NAME}] install默认安装位置: ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "[${PROJECT_NAME}] 此CMakeLists.txt是否是顶层 ${PROJECT_IS_TOP_LEVEL}")
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -114,11 +118,10 @@ set_target_properties(
   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}
 )
 
-target_compile_options(
-  ${PROJECT_NAME}
-  PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/utf-8>
-  PRIVATE $<$<C_COMPILER_ID:MSVC>:/utf-8>
-)
+# 设置编译器选项
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  target_compile_options(${PROJECT_NAME} PRIVATE /utf-8)
+endif()
 
 install(
   TARGETS ${PROJECT_NAME}

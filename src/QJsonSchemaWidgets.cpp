@@ -161,7 +161,7 @@ void QJsonSchemaObject::setOneOf(const QJsonObject &schema)
         auto order = schema.find("ui:order")->toArray();
         for (auto valueRef : order) {
             QString name = valueRef.toString();
-            if (widgetsMap.contains(name)) {
+            if (widgetsMap.count(name)) {
                 layout->addRow(widgetsMap[name].first, widgetsMap[name].second);
             }
         }
@@ -206,7 +206,7 @@ void QJsonSchemaObject::setValue(const QJsonObject &json)
     }
 
     for (const auto &key : json.keys()) {
-        if (widgetsMap.contains(key)) {
+        if (widgetsMap.count(key)) {
             QJsonSchemaWidgetsFactory::setValue(widgetsMap[key].second, json[key]);
         }
     }
