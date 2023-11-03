@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 # 添加版本号信息
 set(PROJECT_VERSION_MAJOR 0) # 主版本号
 set(PROJECT_VERSION_MINOR 1) # 子版本号
-set(PROJECT_VERSION_PATCH 0) # 补丁版本号
+set(PROJECT_VERSION_PATCH 1) # 补丁版本号
 set(PROJECT_VERSION_TWEAK 0) # 修订号，预发布版本
 
 # 设置版本号
