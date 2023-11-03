@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.10)
 
 # 添加版本号信息
 set(PROJECT_VERSION_MAJOR 0) # 主版本号
@@ -26,27 +26,31 @@ project(
 )
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# qt
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
 # 选项
-option(BUILD_EXAMPLES "是否编译例程" ${PROJECT_IS_TOP_LEVEL})
-option(BUILD_DEBUG_POSTFIX_D "是否需要添加后缀以区分是debug还是release" ${PROJECT_IS_TOP_LEVEL})
+option(${PROJECT_NAME}_BUILD_EXAMPLES "是否编译例程" ${PROJECT_IS_TOP_LEVEL})
+option(${PROJECT_NAME}_BUILD_DEBUG_POSTFIX_D "是否需要添加后缀以区分是debug还是release" ${PROJECT_IS_TOP_LEVEL})
 
 # 如果此项目作为其他项目的第三方库，以下的配置不生效
-if(PROJECT_IS_TOP_LEVEL)
+if(${PROJECT_IS_TOP_LEVEL})
   # 设置输出路径
   include(GNUInstallDirs)
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}) # 静态库的文件夹位置
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}) # 动态库的文件夹位置
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}) # 可执行文件的文件夹位置
-  message(STATUS "[${PROJECT_NAME}] 可执行文件的文件夹位置: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+endif()
 
-  # 定义各个版本对应的后缀，例如d，debug版本后缀。
-  if(BUILD_DEBUG_POSTFIX_D)
-    set(CMAKE_DEBUG_POSTFIX "d")
-    set(CMAKE_RELEASE_POSTFIX "")
-    set(CMAKE_RELWITHDEBINFO_POSTFIX "rd")
-    set(CMAKE_MINSIZEREL_POSTFIX "s")
-  endif()
+# 定义各个版本对应的后缀，例如d，debug版本后缀。
+if(${${PROJECT_NAME}_BUILD_DEBUG_POSTFIX_D})
+  set(CMAKE_DEBUG_POSTFIX "d")
+  set(CMAKE_RELEASE_POSTFIX "")
+  set(CMAKE_RELWITHDEBINFO_POSTFIX "rd")
+  set(CMAKE_MINSIZEREL_POSTFIX "s")
 endif()
 
 message(STATUS "[${PROJECT_NAME}] Project ${PROJECT_NAME} v${PROJECT_VERSION}")
@@ -54,9 +58,7 @@ message(STATUS "[${PROJECT_NAME}] C++ compiler ID is: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "[${PROJECT_NAME}] cmake system is: ${CMAKE_SYSTEM_NAME}")
 message(STATUS "[${PROJECT_NAME}] install默认安装位置: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "[${PROJECT_NAME}] 此CMakeLists.txt是否是顶层 ${PROJECT_IS_TOP_LEVEL}")
-
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
+message(STATUS "[${PROJECT_NAME}] 可执行文件的文件夹位置: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets) # 识别是Qt6还是Qt5
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets)
@@ -66,26 +68,25 @@ add_library(${PROJECT_NAME} OBJECT)
 
 # 添加公开的头文件
 file(GLOB_RECURSE INCS include/${PROJECT_NAME}/*.hpp include/${PROJECT_NAME}/*.h)
+file(GLOB_RECURSE SRCS src/*.cpp src/*.c src/*.cc)
 
 target_sources(
   ${PROJECT_NAME}
   PRIVATE ${INCS}
+  PRIVATE ${SRCS}
 )
-
-# 添加源文件
-add_subdirectory(src)
 
 # 添加配置头文件，将CMake中的版本等信息转换为头文件
 configure_file(
-  "${CMAKE_SOURCE_DIR}/config.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/${INSTALL_INCLUDEDIR}/config.h"
+  "${CMAKE_SOURCE_DIR}/Config.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/${INSTALL_INCLUDEDIR}/Config.h"
 )
 
 # 生成输出头文件
 include(GenerateExportHeader)
 generate_export_header(
   ${PROJECT_NAME}
-  EXPORT_FILE_NAME "${CMAKE_CURRENT_BINARY_DIR}/${INSTALL_INCLUDEDIR}/export.h"
+  EXPORT_FILE_NAME "${CMAKE_CURRENT_BINARY_DIR}/${INSTALL_INCLUDEDIR}/Export.h"
 )
 
 target_link_libraries(
@@ -98,9 +99,9 @@ target_link_libraries(
 target_include_directories(
   ${PROJECT_NAME}
   PUBLIC $<INSTALL_INTERFACE:include>
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> # 对外开放的头文件
+  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${INSTALL_INCLUDEDIR}>
-  PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src> # 私有的头文件
+  PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
   PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/QJsonSchemaForm>
 )
 
@@ -132,6 +133,6 @@ install(
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-if(BUILD_EXAMPLES)
+if(${${PROJECT_NAME}_BUILD_EXAMPLES})
   add_subdirectory(examples)
 endif()
