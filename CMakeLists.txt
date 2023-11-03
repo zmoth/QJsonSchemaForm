@@ -26,27 +26,28 @@ project(
 )
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # 选项
-option(BUILD_EXAMPLES "是否编译例程" ${PROJECT_IS_TOP_LEVEL})
-option(BUILD_DEBUG_POSTFIX_D "是否需要添加后缀以区分是debug还是release" ${PROJECT_IS_TOP_LEVEL})
+option(${PROJECT_NAME}_BUILD_EXAMPLES "是否编译例程" ${PROJECT_IS_TOP_LEVEL})
+option(${PROJECT_NAME}_BUILD_DEBUG_POSTFIX_D "是否需要添加后缀以区分是debug还是release" ${PROJECT_IS_TOP_LEVEL})
 
 # 如果此项目作为其他项目的第三方库，以下的配置不生效
-if(PROJECT_IS_TOP_LEVEL)
+if(${PROJECT_IS_TOP_LEVEL})
   # 设置输出路径
   include(GNUInstallDirs)
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}) # 静态库的文件夹位置
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}) # 动态库的文件夹位置
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}) # 可执行文件的文件夹位置
   message(STATUS "[${PROJECT_NAME}] 可执行文件的文件夹位置: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+endif()
 
-  # 定义各个版本对应的后缀，例如d，debug版本后缀。
-  if(BUILD_DEBUG_POSTFIX_D)
-    set(CMAKE_DEBUG_POSTFIX "d")
-    set(CMAKE_RELEASE_POSTFIX "")
-    set(CMAKE_RELWITHDEBINFO_POSTFIX "rd")
-    set(CMAKE_MINSIZEREL_POSTFIX "s")
-  endif()
+# 定义各个版本对应的后缀，例如d，debug版本后缀。
+if(${${PROJECT_NAME}_BUILD_DEBUG_POSTFIX_D})
+  set(CMAKE_DEBUG_POSTFIX "d")
+  set(CMAKE_RELEASE_POSTFIX "")
+  set(CMAKE_RELWITHDEBINFO_POSTFIX "rd")
+  set(CMAKE_MINSIZEREL_POSTFIX "s")
 endif()
 
 message(STATUS "[${PROJECT_NAME}] Project ${PROJECT_NAME} v${PROJECT_VERSION}")
@@ -77,15 +78,15 @@ add_subdirectory(src)
 
 # 添加配置头文件，将CMake中的版本等信息转换为头文件
 configure_file(
-  "${CMAKE_SOURCE_DIR}/config.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/${INSTALL_INCLUDEDIR}/config.h"
+  "${CMAKE_SOURCE_DIR}/Config.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/${INSTALL_INCLUDEDIR}/Config.h"
 )
 
 # 生成输出头文件
 include(GenerateExportHeader)
 generate_export_header(
   ${PROJECT_NAME}
-  EXPORT_FILE_NAME "${CMAKE_CURRENT_BINARY_DIR}/${INSTALL_INCLUDEDIR}/export.h"
+  EXPORT_FILE_NAME "${CMAKE_CURRENT_BINARY_DIR}/${INSTALL_INCLUDEDIR}/Export.h"
 )
 
 target_link_libraries(
@@ -132,6 +133,6 @@ install(
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-if(BUILD_EXAMPLES)
+if(${${PROJECT_NAME}_BUILD_EXAMPLES})
   add_subdirectory(examples)
 endif()
