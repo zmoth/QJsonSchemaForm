@@ -701,8 +701,6 @@ QJsonSchemaNumber::QJsonSchemaNumber(QWidget *parent) : QJsonSchemaWidget(parent
 {
     auto *layout = new QHBoxLayout(this);
     layout->setAlignment(Qt::AlignRight);
-    // layout->setContentsMargins(0, 0, 0, 0);
-    // layout->setSpacing(0);
 }
 
 QJsonSchemaNumber::QJsonSchemaNumber(const QJsonObject &schema, QWidget *parent) : QJsonSchemaNumber(parent)
@@ -773,16 +771,15 @@ void QJsonSchemaNumber::processSchema(const QJsonObject &schema)
     {  // 水平布局
         auto *sliderBox = new QWidget(this);
         sliderBox->setObjectName("sliderBox");
-        sliderBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         layout()->addWidget(sliderBox);
 
         auto *h = new QHBoxLayout(sliderBox);
-        h->setSizeConstraint(QLayout::SetFixedSize);
 
         auto *slider = new QSlider(Qt::Horizontal, sliderBox);
         slider->setObjectName("slider");
 
         auto *spinBox = new QDoubleSpinBox(sliderBox);
+        spinBox->setDecimals(7);
         spinBox->setObjectName("spinBox");
         _widget = spinBox;
 
